@@ -144,55 +144,53 @@ function Analyzing() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 36,
               }}
             >
-              {isRateLimited ? "⏳" : "⚠"}
+              {isRateLimited ? (
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </svg>
+              ) : (
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              )}
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: isRateLimited ? "#b45309" : "#b91c1c" }}>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: isRateLimited ? "#b45309" : "#b91c1c" }}>
                 {isRateLimited ? "잠시 쉬어가요" : "분석 실패"}
               </div>
-              <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24, lineHeight: 1.6 }}>
-                {isRateLimited 
-                  ? "무료 버전은 요청이 많으면 잠시 쉬어야 해요 ㅠㅠ\n30초 후에 다시 시도해주세요!"
-                  : (localError.message || "상품 분석에 실패했습니다.")}
+              <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 28, lineHeight: 1.8 }}>
+                {isRateLimited ? (
+                  <>
+                    무료 버전은 요청이 많으면 잠시 쉬어야 해요 ㅠㅠ<br />
+                    30초 후에 다시 시도해주세요!
+                  </>
+                ) : (
+                  localError.message || "상품 분석에 실패했습니다."
+                )}
               </div>
-              <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-                <button
-                  onClick={() => {
-                    setPendingFile(null);
-                    navigate("/?open=1");
-                  }}
-                  style={{
-                    padding: "12px 32px",
-                    borderRadius: 12,
-                    border: "2px solid #1f2937",
-                    backgroundColor: "transparent",
-                    color: "#1f2937",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  다시 시도하기
-                </button>
-                <button
-                  onClick={handleClose}
-                  style={{
-                    padding: "12px 32px",
-                    borderRadius: 12,
-                    border: "none",
-                    backgroundColor: "#1f2937",
-                    color: "#ffffff",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  홈으로 돌아가기
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  setPendingFile(null);
+                  navigate("/?open=1");
+                }}
+                style={{
+                  padding: "14px 40px",
+                  borderRadius: 12,
+                  border: "none",
+                  backgroundColor: "#1f2937",
+                  color: "#ffffff",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                다시 분석하기
+              </button>
             </div>
           </>
         ) : (

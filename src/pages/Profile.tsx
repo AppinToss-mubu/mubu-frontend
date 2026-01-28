@@ -19,7 +19,24 @@ export default function Profile() {
           textAlign: "center",
         }}
       >
-        <div style={{ fontSize: 48, marginBottom: 16 }}>👤</div>
+        <div
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: "50%",
+            backgroundColor: "var(--bg)",
+            border: "2px solid var(--border)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+          }}
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
           로그인이 필요해요
         </div>
