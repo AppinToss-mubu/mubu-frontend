@@ -309,15 +309,58 @@ function Result() {
         >
           계산 중...
         </div>
+      ) : !hasKoreaPrice ? (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            borderRadius: 16,
+            background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: 36, marginBottom: 8 }}>🔍</div>
+          <div
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: "#92400e",
+              marginBottom: 8,
+            }}
+          >
+            한국에서 구할 수 없을 수도 있어요
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              color: "#a16207",
+              lineHeight: 1.6,
+            }}
+          >
+            이 상품은 한국에서 판매되지 않거나<br />
+            정확히 일치하는 상품을 찾지 못했어요
+          </div>
+          <div
+            style={{
+              marginTop: 16,
+              padding: 12,
+              borderRadius: 8,
+              backgroundColor: "rgba(255,255,255,0.6)",
+              fontSize: 13,
+              color: "#78350f",
+            }}
+          >
+            💡 현지에서 구매하시는 걸 추천해요!<br />
+            현지가: <strong>{localTotal.toLocaleString()}{currencySymbol}</strong> (약 ₩{formatCurrency(localTotalKrw)})
+          </div>
+        </div>
       ) : (
         <div
           style={{
             marginTop: 16,
             padding: 24,
             borderRadius: 16,
-            background: !hasKoreaPrice
-              ? "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)"
-              : savedTotal > 0
+            background: savedTotal > 0
               ? "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)"
               : savedTotal < 0
               ? "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)"
@@ -332,16 +375,16 @@ function Result() {
               marginBottom: 4,
             }}
           >
-            {hasKoreaPrice ? (savedTotal > 0 ? "−" : savedTotal < 0 ? "+" : "−") + " 총 절약" : "−  총 절약"}
+            {(savedTotal > 0 ? "−" : savedTotal < 0 ? "+" : "−") + " 총 절약"}
           </div>
           <div
             style={{
               fontSize: 28,
               fontWeight: 800,
-              color: !hasKoreaPrice ? "#6b7280" : savedTotal > 0 ? "#0369a1" : savedTotal < 0 ? "#15803d" : "var(--fg)",
+              color: savedTotal > 0 ? "#0369a1" : savedTotal < 0 ? "#15803d" : "var(--fg)",
             }}
           >
-            {hasKoreaPrice ? `${Math.abs(savedTotal).toLocaleString()}원` : "0원"}
+            {`${Math.abs(savedTotal).toLocaleString()}원`}
           </div>
           <div
             style={{
@@ -350,9 +393,7 @@ function Result() {
               marginTop: 8,
             }}
           >
-            {!hasKoreaPrice
-              ? "한국에서 구할 수 없는걸 수도"
-              : savedTotal > 0
+            {savedTotal > 0
               ? "한국에서 사는 것이 더 저렴해요"
               : savedTotal < 0
               ? "현지에서 사는 것이 더 저렴해요"
@@ -361,57 +402,82 @@ function Result() {
         </div>
       )}
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          marginTop: 16,
-        }}
-      >
-        <button
-          onClick={handleViewKoreaPrice}
-          disabled={!externalLinkUrl}
+      {hasKoreaPrice ? (
+        <div
           style={{
-            padding: "14px 16px",
-            borderRadius: 12,
-            border: "1px solid var(--border)",
-            backgroundColor: "var(--card)",
-            color: "var(--fg)",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: externalLinkUrl ? "pointer" : "not-allowed",
-            opacity: externalLinkUrl ? 1 : 0.5,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginTop: 16,
           }}
         >
-          <span>↗</span> 한국가격 보기
-        </button>
-        <button
-          onClick={handlePurchase}
-          disabled={!externalLinkUrl}
-          style={{
-            padding: "14px 16px",
-            borderRadius: 12,
-            border: "none",
-            backgroundColor: "#1f2937",
-            color: "#ffffff",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: externalLinkUrl ? "pointer" : "not-allowed",
-            opacity: externalLinkUrl ? 1 : 0.5,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-          }}
-        >
-          <span>✓</span> 구매함
-        </button>
-      </div>
+          <button
+            onClick={handleViewKoreaPrice}
+            disabled={!externalLinkUrl}
+            style={{
+              padding: "14px 16px",
+              borderRadius: 12,
+              border: "1px solid var(--border)",
+              backgroundColor: "var(--card)",
+              color: "var(--fg)",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: externalLinkUrl ? "pointer" : "not-allowed",
+              opacity: externalLinkUrl ? 1 : 0.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            <span>↗</span> 한국가격 보기
+          </button>
+          <button
+            onClick={handlePurchase}
+            disabled={!externalLinkUrl}
+            style={{
+              padding: "14px 16px",
+              borderRadius: 12,
+              border: "none",
+              backgroundColor: "#1f2937",
+              color: "#ffffff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: externalLinkUrl ? "pointer" : "not-allowed",
+              opacity: externalLinkUrl ? 1 : 0.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            <span>✓</span> 구매함
+          </button>
+        </div>
+      ) : (
+        <div style={{ marginTop: 16 }}>
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              width: "100%",
+              padding: "14px 16px",
+              borderRadius: 12,
+              border: "none",
+              backgroundColor: "#1f2937",
+              color: "#ffffff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            다른 상품 비교하기
+          </button>
+        </div>
+      )}
 
       <div
         style={{
