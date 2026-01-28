@@ -10,7 +10,7 @@ const MAX_ITEMS = 20;
 
 export function loadRecentComparisons(): RecentComparison[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = sessionStorage.getItem(KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as RecentComparison[];
     if (!Array.isArray(parsed)) return [];
@@ -21,7 +21,7 @@ export function loadRecentComparisons(): RecentComparison[] {
 }
 
 export function saveRecentComparisons(items: RecentComparison[]) {
-  localStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX_ITEMS)));
+  sessionStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX_ITEMS)));
 }
 
 export function upsertRecentComparison(item: RecentComparison) {

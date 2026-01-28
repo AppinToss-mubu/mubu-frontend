@@ -15,6 +15,7 @@ function Analyzing() {
   const { mutateAsync: compareWithImage } = useCompareWithImage();
   const [statusText, setStatusText] = useState("가격표를 찾는 중...");
   const [localError, setLocalError] = useState<Error | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
   const hasStartedRef = useRef(false);
   const isNavigatingRef = useRef(false);
 
@@ -64,6 +65,10 @@ function Analyzing() {
         console.log("[Analyzing] 실패:", err);
         clearInterval(interval);
         console.error("분석 실패:", err);
+        const errorMessage = err?.message || "";
+        if (errorMessage.includes("429") || errorMessage.includes("Too Many") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
+          setIsRateLimited(true);
+        }
         setLocalError(err as Error);
       });
 
@@ -130,37 +135,62 @@ function Analyzing() {
                 width: 80,
                 height: 80,
                 borderRadius: "50%",
-                backgroundColor: "#fee2e2",
+                backgroundColor: isRateLimited ? "#fef3c7" : "#fee2e2",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 36,
               }}
             >
-              ⚠
+              {isRateLimited ? "⏳" : "⚠"}
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: "#b91c1c" }}>
-                분석 실패
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: isRateLimited ? "#b45309" : "#b91c1c" }}>
+                {isRateLimited ? "잠시 쉬어가요" : "분석 실패"}
               </div>
-              <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24 }}>
-                {localError.message || "상품 분석에 실패했습니다."}
+              <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24, lineHeight: 1.6 }}>
+                {isRateLimited 
+                  ? "무료 버전은 요청이 많으면 잠시 쉬어야 해요 ㅠㅠ\n30초 후에 다시 시도해주세요!"
+                  : (localError.message || "상품 분석에 실패했습니다.")}
               </div>
-              <button
-                onClick={handleClose}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: 12,
-                  border: "none",
-                  backgroundColor: "#1f2937",
-                  color: "#ffffff",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                홈으로 돌아가기
-              </button>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+                {isRateLimited && (
+                  <button
+                    onClick={() => {
+                      setLocalError(null);
+                      setIsRateLimited(false);
+                      hasStartedRef.current = false;
+                    }}
+                    style={{
+                      padding: "12px 32px",
+                      borderRadius: 12,
+                      border: "2px solid #1f2937",
+                      backgroundColor: "transparent",
+                      color: "#1f2937",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    다시 분석하기
+                  </button>
+                )}
+                <button
+                  onClick={handleClose}
+                  style={{
+                    padding: "12px 32px",
+                    borderRadius: 12,
+                    border: "none",
+                    backgroundColor: "#1f2937",
+                    color: "#ffffff",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  홈으로 돌아가기
+                </button>
+              </div>
             </div>
           </>
         ) : (
