@@ -4,8 +4,6 @@
  * - 업로드/촬영 탭 형태
  */
 
-import { useState, useEffect } from "react";
-
 interface ImageSourceSheetProps {
   open: boolean;
   onClose: () => void;
@@ -21,27 +19,7 @@ export function ImageSourceSheet({
   onPickAlbum,
   showCamera = true,
 }: ImageSourceSheetProps) {
-  const [activeTab, setActiveTab] = useState<"upload" | "camera">("upload");
-
-  useEffect(() => {
-    if (open) {
-      setActiveTab(showCamera ? "camera" : "upload");
-    }
-  }, [open, showCamera]);
-
   if (!open) return null;
-
-  const handleCameraClick = () => {
-    onPickCamera();
-  };
-
-  const handleUploadClick = () => {
-    onPickAlbum();
-  };
-
-  const handleTabClick = (tab: "upload" | "camera") => {
-    setActiveTab(tab);
-  };
 
   return (
     <div
@@ -110,90 +88,46 @@ export function ImageSourceSheet({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            minHeight: 200,
-            marginBottom: 24,
+            padding: "16px 0 24px",
           }}
         >
-          {activeTab === "camera" ? (
-            <>
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  border: "3px solid var(--border)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 16,
-                }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
-                </svg>
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-                상품 촬영하기
-              </div>
-              <div style={{ fontSize: 13, color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
-                가격표가 보이도록 상품을 촬영해주세요<br />
-                (Android/iOS 모두 지원)
-              </div>
-            </>
-          ) : (
-            <>
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  border: "3px solid var(--border)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 16,
-                }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21,15 16,10 5,21"/>
-                </svg>
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-                앨범에서 선택
-              </div>
-              <div style={{ fontSize: 13, color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
-                갤러리에서 상품 이미지를 선택해주세요
-              </div>
-            </>
-          )}
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              border: "3px solid var(--border)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 16,
+            }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <div style={{ fontSize: 14, color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
+            가격표가 보이도록 상품을 촬영하거나<br />
+            앨범에서 이미지를 선택해주세요
+          </div>
         </div>
 
         <div
           style={{
             display: "grid",
             gridTemplateColumns: showCamera ? "1fr 1fr" : "1fr",
-            gap: 0,
-            borderRadius: 12,
-            overflow: "hidden",
-            border: "1px solid var(--border)",
+            gap: 12,
           }}
         >
           <button
-            onClick={() => {
-              if (activeTab === "upload") {
-                handleUploadClick();
-              } else {
-                handleTabClick("upload");
-              }
-            }}
+            onClick={onPickAlbum}
             style={{
-              padding: "14px 16px",
-              backgroundColor: activeTab === "upload" ? "var(--card)" : "var(--bg)",
-              border: "none",
-              borderRight: showCamera ? "1px solid var(--border)" : "none",
+              padding: "16px",
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
               fontSize: 14,
               fontWeight: 600,
               color: "var(--fg)",
@@ -201,44 +135,39 @@ export function ImageSourceSheet({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 6,
+              gap: 8,
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
               <polyline points="21,15 16,10 5,21"/>
             </svg>
-            앨범
+            앨범에서 선택
           </button>
           {showCamera && (
             <button
-              onClick={() => {
-                if (activeTab === "camera") {
-                  handleCameraClick();
-                } else {
-                  handleTabClick("camera");
-                }
-              }}
+              onClick={onPickCamera}
               style={{
-                padding: "14px 16px",
-                backgroundColor: activeTab === "camera" ? "var(--card)" : "var(--bg)",
+                padding: "16px",
+                backgroundColor: "var(--primary)",
                 border: "none",
+                borderRadius: 12,
                 fontSize: 14,
                 fontWeight: 600,
-                color: "var(--fg)",
+                color: "var(--primary-contrast)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 6,
+                gap: 8,
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                 <circle cx="12" cy="13" r="4"/>
               </svg>
-              촬영
+              촬영하기
             </button>
           )}
         </div>
