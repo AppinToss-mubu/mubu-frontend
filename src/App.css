@@ -51,22 +51,31 @@
   height: 76px;
   background: var(--bg);
   border-top: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  display: flex;
   align-items: center;
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  justify-content: space-around;
+  padding: 8px 24px calc(8px + env(safe-area-inset-bottom));
 }
 
 .navItem {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   cursor: pointer;
   user-select: none;
+  min-width: 60px;
+}
+
+.navItem svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
 }
 
 .navItemActive {
@@ -78,15 +87,16 @@
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: none;
   background: var(--primary);
   color: var(--primary-contrast);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow);
-  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transform: translateY(-18px);
+  cursor: pointer;
+  font-size: 20px;
 }
 
 /* bottom sheet */
