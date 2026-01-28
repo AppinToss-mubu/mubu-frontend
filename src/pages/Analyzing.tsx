@@ -4,7 +4,7 @@
  * - 이미지 업로드 후 AI 분석 로딩 화면
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompareWithImage } from "../hooks/usePriceCompare";
 import { usePriceStore } from "../store/priceStore";
@@ -14,12 +14,21 @@ function Analyzing() {
   const { pendingFile, setImageId, setCompareResult, setPendingFile } = usePriceStore();
   const { mutate: compareWithImage, error } = useCompareWithImage();
   const [statusText, setStatusText] = useState("가격표를 찾는 중...");
+  const hasStartedRef = useRef(false);
+  const isNavigatingRef = useRef(false);
 
   useEffect(() => {
+    // 이미 시작했거나 네비게이션 중이면 스킵
+    if (hasStartedRef.current || isNavigatingRef.current) {
+      return;
+    }
+
     if (!pendingFile) {
       navigate("/");
       return;
     }
+
+    hasStartedRef.current = true;
 
     const statusMessages = [
       "가격표를 찾는 중...",
@@ -35,6 +44,8 @@ function Analyzing() {
     compareWithImage(pendingFile, {
       onSuccess: (data) => {
         clearInterval(interval);
+        isNavigatingRef.current = true;
+        console.log("[Analyzing] 성공! 네비게이션:", `/price-confirm/${data.imageId}`);
         setImageId(data.imageId);
         setCompareResult(data);
         setPendingFile(null);
@@ -53,6 +64,11 @@ function Analyzing() {
     setPendingFile(null);
     navigate("/");
   };
+
+  // 네비게이션 중이면 null 반환 (리렌더 방지)
+  if (isNavigatingRef.current) {
+    return null;
+  }
 
   if (!pendingFile && !error) {
     return null;
