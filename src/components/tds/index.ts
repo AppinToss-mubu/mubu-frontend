@@ -6,3 +6,7 @@
 
 export { TDSButton } from "./TDSButton";
 export { TDSBottomSheet } from "./TDSBottomSheet";
+export { TDSLoader } from "./TDSLoader";
+export { TDSTextField } from "./TDSTextField";
+export { TDSNumericSpinner } from "./TDSNumericSpinner";
+export { TDSListRow, TDSListRowTexts } from "./TDSListRow";
