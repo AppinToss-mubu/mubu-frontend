@@ -12,7 +12,7 @@ import { usePriceStore } from "../store/priceStore";
 function Analyzing() {
   const navigate = useNavigate();
   const { pendingFile, setImageId, setCompareResult, setPendingFile } = usePriceStore();
-  const { mutate: compareWithImage } = useCompareWithImage();
+  const { mutateAsync: compareWithImage } = useCompareWithImage();
   const [statusText, setStatusText] = useState("가격표를 찾는 중...");
   const [localError, setLocalError] = useState<Error | null>(null);
   const hasStartedRef = useRef(false);
@@ -44,9 +44,9 @@ function Analyzing() {
 
     console.log("[Analyzing] API 호출 시작");
     
-    compareWithImage(pendingFile, {
-      onSuccess: (data) => {
-        console.log("[Analyzing] onSuccess 호출됨, data:", data);
+    compareWithImage(pendingFile)
+      .then((data) => {
+        console.log("[Analyzing] 성공! data:", data);
         clearInterval(interval);
         isNavigatingRef.current = true;
         
@@ -59,14 +59,13 @@ function Analyzing() {
         
         console.log("[Analyzing] store 업데이트 완료, navigate 호출");
         navigate(targetUrl);
-      },
-      onError: (err) => {
-        console.log("[Analyzing] onError 호출됨:", err);
+      })
+      .catch((err) => {
+        console.log("[Analyzing] 실패:", err);
         clearInterval(interval);
         console.error("분석 실패:", err);
         setLocalError(err as Error);
-      },
-    });
+      });
 
     return () => clearInterval(interval);
   }, [pendingFile, compareWithImage, setImageId, setCompareResult, setPendingFile, navigate]);
