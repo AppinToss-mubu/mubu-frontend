@@ -54,3 +54,7 @@ Thumbs.db
 
 # Vite
 .vite
+
+# Replit attached files
+attached_assets/
+*.zip
