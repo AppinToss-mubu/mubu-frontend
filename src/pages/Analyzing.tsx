@@ -8,6 +8,8 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompareWithImage } from "../hooks/usePriceCompare";
 import { usePriceStore } from "../store/priceStore";
+import { TDSLoader, TDSButton } from "../components/tds";
+import { isTossEnvironment } from "../utils/env";
 
 function Analyzing() {
   const navigate = useNavigate();
@@ -167,63 +169,85 @@ function Analyzing() {
                   localError.message || "상품 분석에 실패했습니다."
                 )}
               </div>
-              <button
-                onClick={() => {
-                  setPendingFile(null);
-                  navigate("/?open=1");
-                }}
-                style={{
-                  padding: "14px 40px",
-                  borderRadius: 12,
-                  border: "none",
-                  backgroundColor: "#1f2937",
-                  color: "#ffffff",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                다시 분석하기
-              </button>
+              {isTossEnvironment() ? (
+                <TDSButton
+                  onClick={() => {
+                    setPendingFile(null);
+                    navigate("/?open=1");
+                  }}
+                  color="dark"
+                  variant="fill"
+                  size="large"
+                >
+                  다시 분석하기
+                </TDSButton>
+              ) : (
+                <button
+                  onClick={() => {
+                    setPendingFile(null);
+                    navigate("/?open=1");
+                  }}
+                  style={{
+                    padding: "14px 40px",
+                    borderRadius: 12,
+                    border: "none",
+                    backgroundColor: "#1f2937",
+                    color: "#ffffff",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  다시 분석하기
+                </button>
+              )}
             </div>
           </>
         ) : (
           <>
-            <div
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                backgroundColor: "var(--card)",
-                border: "2px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                  border: "3px solid transparent",
-                  borderTopColor: "var(--primary)",
-                  animation: "spin 1.2s linear infinite",
-                }}
+            {isTossEnvironment() ? (
+              <TDSLoader 
+                size="large" 
+                label={`AI가 상품을 분석하고 있습니다\n${statusText}`}
               />
-              <span style={{ fontSize: 32 }}>🔍</span>
-            </div>
-
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-                AI가 상품을 분석하고 있습니다
-              </div>
-              <div style={{ fontSize: 14, color: "var(--muted)" }}>
-                {statusText}
-              </div>
-            </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    backgroundColor: "var(--card)",
+                    border: "2px solid var(--border)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "50%",
+                      border: "3px solid transparent",
+                      borderTopColor: "var(--primary)",
+                      animation: "spin 1.2s linear infinite",
+                    }}
+                  />
+                  <span style={{ fontSize: 32 }}>🔍</span>
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+                    AI가 상품을 분석하고 있습니다
+                  </div>
+                  <div style={{ fontSize: 14, color: "var(--muted)" }}>
+                    {statusText}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

@@ -9,6 +9,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSummary, useExternalLink } from "../hooks/usePriceCompare";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { usePriceStore } from "../store/priceStore";
+import { TDSNumericSpinner, TDSButton } from "../components/tds";
+import { isTossEnvironment } from "../utils/env";
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ko-KR").format(amount);
@@ -96,10 +98,6 @@ function Result() {
   const savedTotal = localTotalKrw - koreaTotal;
   const hasKoreaPrice = koreaUnitPrice > 0;
 
-  const handleQuantityChange = (delta: number) => {
-    setQuantity((prev) => Math.max(1, prev + delta));
-  };
-
   const handleViewKoreaPrice = () => {
     if (externalLinkUrl) {
       window.open(externalLinkUrl, "_blank");
@@ -154,57 +152,69 @@ function Result() {
           }}
         >
           <span style={{ fontSize: 14, color: "var(--muted)" }}>수량</span>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              padding: "8px 16px",
-              borderRadius: 24,
-              backgroundColor: "var(--bg)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            <button
-              onClick={() => handleQuantityChange(-1)}
-              disabled={quantity <= 1}
+          {isTossEnvironment() ? (
+            <TDSNumericSpinner
+              value={quantity}
+              onChange={setQuantity}
+              min={1}
+              max={99}
+              size="large"
+              decreaseAriaLabel="수량 줄이기"
+              increaseAriaLabel="수량 늘리기"
+            />
+          ) : (
+            <div
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                border: "1px solid var(--border)",
-                backgroundColor: "var(--card)",
-                fontSize: 18,
-                cursor: quantity > 1 ? "pointer" : "not-allowed",
-                opacity: quantity > 1 ? 1 : 0.5,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              −
-            </button>
-            <span style={{ fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: "center" }}>
-              {quantity}
-            </span>
-            <button
-              onClick={() => handleQuantityChange(1)}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
+                gap: 16,
+                padding: "8px 16px",
+                borderRadius: 24,
+                backgroundColor: "var(--bg)",
                 border: "1px solid var(--border)",
-                backgroundColor: "var(--card)",
-                fontSize: 18,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
               }}
             >
-              +
-            </button>
-          </div>
+              <button
+                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                disabled={quantity <= 1}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--card)",
+                  fontSize: 18,
+                  cursor: quantity > 1 ? "pointer" : "not-allowed",
+                  opacity: quantity > 1 ? 1 : 0.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                −
+              </button>
+              <span style={{ fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: "center" }}>
+                {quantity}
+              </span>
+              <button
+                onClick={() => setQuantity((prev) => prev + 1)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--card)",
+                  fontSize: 18,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                +
+              </button>
+            </div>
+          )}
         </div>
 
         <div
@@ -411,71 +421,90 @@ function Result() {
             marginTop: 16,
           }}
         >
-          <button
-            onClick={handleViewKoreaPrice}
-            disabled={!externalLinkUrl}
-            style={{
-              padding: "14px 16px",
-              borderRadius: 12,
-              border: "1px solid var(--border)",
-              backgroundColor: "var(--card)",
-              color: "var(--fg)",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: externalLinkUrl ? "pointer" : "not-allowed",
-              opacity: externalLinkUrl ? 1 : 0.5,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-            }}
-          >
-            <span>↗</span> 한국가격 보기
-          </button>
-          <button
-            onClick={handlePurchase}
-            disabled={!externalLinkUrl}
-            style={{
-              padding: "14px 16px",
-              borderRadius: 12,
-              border: "none",
-              backgroundColor: "#1f2937",
-              color: "#ffffff",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: externalLinkUrl ? "pointer" : "not-allowed",
-              opacity: externalLinkUrl ? 1 : 0.5,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-            }}
-          >
-            <span>✓</span> 구매함
-          </button>
+          {isTossEnvironment() ? (
+            <>
+              <TDSButton onClick={handleViewKoreaPrice} disabled={!externalLinkUrl} color="light" variant="weak" size="large" style={{ border: "1px solid var(--border)" }}>
+                <span>↗</span> 한국가격 보기
+              </TDSButton>
+              <TDSButton onClick={handlePurchase} disabled={!externalLinkUrl} color="dark" variant="fill" size="large">
+                <span>✓</span> 구매함
+              </TDSButton>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleViewKoreaPrice}
+                disabled={!externalLinkUrl}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--card)",
+                  color: "var(--fg)",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: externalLinkUrl ? "pointer" : "not-allowed",
+                  opacity: externalLinkUrl ? 1 : 0.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span>↗</span> 한국가격 보기
+              </button>
+              <button
+                onClick={handlePurchase}
+                disabled={!externalLinkUrl}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "none",
+                  backgroundColor: "#1f2937",
+                  color: "#ffffff",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: externalLinkUrl ? "pointer" : "not-allowed",
+                  opacity: externalLinkUrl ? 1 : 0.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span>✓</span> 구매함
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div style={{ marginTop: 16 }}>
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              width: "100%",
-              padding: "14px 16px",
-              borderRadius: 12,
-              border: "none",
-              backgroundColor: "#1f2937",
-              color: "#ffffff",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-            }}
-          >
-            다른 상품 비교하기
-          </button>
+          {isTossEnvironment() ? (
+            <TDSButton onClick={() => navigate("/")} color="dark" variant="fill" size="large" display="full">
+              다른 상품 비교하기
+            </TDSButton>
+          ) : (
+            <button
+              onClick={() => navigate("/")}
+              style={{
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 12,
+                border: "none",
+                backgroundColor: "#1f2937",
+                color: "#ffffff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              다른 상품 비교하기
+            </button>
+          )}
         </div>
       )}
 

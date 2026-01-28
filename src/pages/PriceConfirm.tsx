@@ -7,6 +7,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
+import { TDSButton, TDSTextField } from "../components/tds";
+import { isTossEnvironment } from "../utils/env";
 
 const getCurrencySymbol = (currency: string): string => {
   const symbols: Record<string, string> = {
@@ -231,44 +233,57 @@ function PriceConfirm() {
                 gap: 12,
               }}
             >
-              <button
-                onClick={handleEdit}
-                style={{
-                  padding: "14px 16px",
-                  borderRadius: 12,
-                  border: "1px solid var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--fg)",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <span>✎</span> 수정
-              </button>
-              <button
-                onClick={handleConfirm}
-                style={{
-                  padding: "14px 16px",
-                  borderRadius: 12,
-                  border: "none",
-                  backgroundColor: "#1f2937",
-                  color: "#ffffff",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <span>✓</span> 맞아요
-              </button>
+              {isTossEnvironment() ? (
+                <>
+                  <TDSButton onClick={handleEdit} color="light" variant="weak" size="large" style={{ border: "1px solid var(--border)" }}>
+                    <span>✎</span> 수정
+                  </TDSButton>
+                  <TDSButton onClick={handleConfirm} color="dark" variant="fill" size="large">
+                    <span>✓</span> 맞아요
+                  </TDSButton>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleEdit}
+                    style={{
+                      padding: "14px 16px",
+                      borderRadius: 12,
+                      border: "1px solid var(--border)",
+                      backgroundColor: "var(--bg)",
+                      color: "var(--fg)",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <span>✎</span> 수정
+                  </button>
+                  <button
+                    onClick={handleConfirm}
+                    style={{
+                      padding: "14px 16px",
+                      borderRadius: 12,
+                      border: "none",
+                      backgroundColor: "#1f2937",
+                      color: "#ffffff",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <span>✓</span> 맞아요
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -333,74 +348,100 @@ function PriceConfirm() {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 13,
-                  color: "var(--muted)",
-                  marginBottom: 8,
-                }}
-              >
-                가격
-              </label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={editPrice}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
-                    setEditPrice(val);
-                  }
-                }}
-                placeholder="0"
-                style={{
-                  width: "100%",
-                  padding: "14px 16px",
-                  borderRadius: 12,
-                  border: "1px solid var(--border)",
-                  backgroundColor: "var(--bg)",
-                  fontSize: 18,
-                  color: "var(--fg)",
-                  boxSizing: "border-box",
-                }}
-              />
+              {isTossEnvironment() ? (
+                <TDSTextField
+                  value={editPrice}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                      setEditPrice(val);
+                    }
+                  }}
+                  label="가격"
+                  placeholder="0"
+                  prefix={getCurrencySymbol(editCurrency)}
+                  inputMode="decimal"
+                  variant="box"
+                />
+              ) : (
+                <>
+                  <label style={{ display: "block", fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
+                    가격
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={editPrice}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                        setEditPrice(val);
+                      }
+                    }}
+                    placeholder="0"
+                    style={{
+                      width: "100%",
+                      padding: "14px 16px",
+                      borderRadius: 12,
+                      border: "1px solid var(--border)",
+                      backgroundColor: "var(--bg)",
+                      fontSize: 18,
+                      color: "var(--fg)",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </>
+              )}
             </div>
 
-            <button
-              onClick={handleEditSubmit}
-              style={{
-                width: "100%",
-                padding: "14px 16px",
-                borderRadius: 12,
-                border: "none",
-                backgroundColor: "#1f2937",
-                color: "#ffffff",
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              확인
-            </button>
-
-            {editMode && (
-              <button
-                onClick={() => setEditMode(false)}
-                style={{
-                  width: "100%",
-                  marginTop: 12,
-                  padding: "12px 16px",
-                  borderRadius: 12,
-                  border: "1px solid var(--border)",
-                  backgroundColor: "transparent",
-                  color: "var(--muted)",
-                  fontSize: 14,
-                  cursor: "pointer",
-                }}
-              >
-                취소
-              </button>
+            {isTossEnvironment() ? (
+              <>
+                <TDSButton onClick={handleEditSubmit} color="dark" variant="fill" size="xlarge" display="full">
+                  확인
+                </TDSButton>
+                {editMode && (
+                  <TDSButton onClick={() => setEditMode(false)} color="light" variant="weak" size="large" display="full" style={{ marginTop: 12, border: "1px solid var(--border)" }}>
+                    취소
+                  </TDSButton>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleEditSubmit}
+                  style={{
+                    width: "100%",
+                    padding: "14px 16px",
+                    borderRadius: 12,
+                    border: "none",
+                    backgroundColor: "#1f2937",
+                    color: "#ffffff",
+                    fontSize: 16,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  확인
+                </button>
+                {editMode && (
+                  <button
+                    onClick={() => setEditMode(false)}
+                    style={{
+                      width: "100%",
+                      marginTop: 12,
+                      padding: "12px 16px",
+                      borderRadius: 12,
+                      border: "1px solid var(--border)",
+                      backgroundColor: "transparent",
+                      color: "var(--muted)",
+                      fontSize: 14,
+                      cursor: "pointer",
+                    }}
+                  >
+                    취소
+                  </button>
+                )}
+              </>
             )}
           </div>
         )}
