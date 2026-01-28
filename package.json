@@ -4,10 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+<<<<<<< Updated upstream
     "dev": "vite",
     "dev:toss": "granite dev",
     "build": "tsc -b && vite build",
     "build:toss": "granite build",
+=======
+    "dev": "granite dev",
+    "dev:toss": "granite dev",
+    "build": "granite build",
+>>>>>>> Stashed changes
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "ait deploy"

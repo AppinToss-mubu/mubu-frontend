@@ -1,6 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+<<<<<<< Updated upstream
+=======
+import { TDSMobileAITProvider } from "@toss/tds-mobile-ait";
+import { isTossEnvironment } from "./utils/env";
+>>>>>>> Stashed changes
 import "./index.css";
 import App from "./App.tsx";
 
@@ -14,10 +19,31 @@ const queryClient = new QueryClient({
   },
 });
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+// Toss 환경에서만 TDS Provider 사용
+const AppWithProviders = () => {
+  const content = (
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
+  );
+
+  // Toss 환경에서만 TDSMobileAITProvider로 감싸기
+  if (isTossEnvironment()) {
+    return <TDSMobileAITProvider>{content}</TDSMobileAITProvider>;
+  }
+
+  // 일반 웹 환경에서는 Provider 없이 렌더링
+  return content;
+};
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+<<<<<<< Updated upstream
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+=======
+    <AppWithProviders />
+>>>>>>> Stashed changes
   </StrictMode>,
 );
