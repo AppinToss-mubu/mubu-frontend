@@ -159,27 +159,24 @@ function Analyzing() {
                   : (localError.message || "상품 분석에 실패했습니다.")}
               </div>
               <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-                {isRateLimited && (
-                  <button
-                    onClick={() => {
-                      setLocalError(null);
-                      setIsRateLimited(false);
-                      hasStartedRef.current = false;
-                    }}
-                    style={{
-                      padding: "12px 32px",
-                      borderRadius: 12,
-                      border: "2px solid #1f2937",
-                      backgroundColor: "transparent",
-                      color: "#1f2937",
-                      fontSize: 15,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    다시 분석하기
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    setPendingFile(null);
+                    navigate("/?open=1");
+                  }}
+                  style={{
+                    padding: "12px 32px",
+                    borderRadius: 12,
+                    border: "2px solid #1f2937",
+                    backgroundColor: "transparent",
+                    color: "#1f2937",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  다시 시도하기
+                </button>
                 <button
                   onClick={handleClose}
                   style={{
