@@ -10,6 +10,8 @@ import { ImageSourceSheet } from "../components/ImageSourceSheet";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { useToss } from "../hooks/useToss";
 import { usePriceStore } from "../store/priceStore";
+import { isTossEnvironment } from "../utils/env";
+import { TDSButton } from "../components/tds";
 
 function Home() {
   const navigate = useNavigate();
@@ -18,6 +20,16 @@ function Home() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { items: recent } = useRecentComparisons();
   const { isAvailable: isTossAvailable, openCamera } = useToss();
+
+  // 디버깅: Toss 환경 감지 확인
+  useEffect(() => {
+    const isToss = isTossEnvironment();
+    console.log("🔍 [Home] Toss 환경 감지:", isToss);
+    console.log("  - window.Toss:", typeof (window as any).Toss);
+    console.log("  - User-Agent:", navigator.userAgent);
+    console.log("  - Location:", window.location.href);
+    console.log("  - Hostname:", window.location.hostname);
+  }, []);
 
   const albumInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
@@ -53,7 +65,7 @@ function Home() {
       return;
     }
     setLocalError(null);
-    
+
     // 스토어 초기화 후 파일 저장, 분석 페이지로 이동
     reset();
     setPendingFile(file);
@@ -108,31 +120,71 @@ function Home() {
       </div>
 
       <div style={{ marginTop: 22 }}>
-        <button
-          type="button"
-          onClick={() => setIsSheetOpen(true)}
-          style={{
-            width: "100%",
-            padding: "16px 18px",
-            borderRadius: "16px",
-            border: "none",
-            background: "var(--primary)",
-            color: "var(--primary-contrast)",
-            fontSize: "16px",
-            fontWeight: 800,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "10px",
-            cursor: "pointer",
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
-          </svg>
-          상품 촬영하기
-        </button>
+        {isTossEnvironment() ? (
+          <TDSButton
+            onClick={() => setIsSheetOpen(true)}
+            color="primary"
+            variant="fill"
+            size="xlarge"
+            display="full"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            상품 촬영하기
+          </TDSButton>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsSheetOpen(true)}
+            style={{
+              width: "100%",
+              padding: "16px 18px",
+              borderRadius: "16px",
+              border: "none",
+              background: "var(--primary)",
+              color: "var(--primary-contrast)",
+              fontSize: "16px",
+              fontWeight: 800,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+              cursor: "pointer",
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            상품 촬영하기
+          </button>
+        )}
 
         <input
           ref={albumInputRef}
