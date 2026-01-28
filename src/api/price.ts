@@ -14,6 +14,12 @@ import type {
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+// 앱 시작 시 API URL 확인용 로그
+console.log("========================================");
+console.log("[API] VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
+console.log("[API] 최종 API_BASE_URL:", API_BASE_URL);
+console.log("========================================");
+
 /**
  * 이미지 기반 가격 비교 API
  * - 프론트엔드에서 imageId를 미리 생성해서 함께 전송한다.
