@@ -11,3 +11,4 @@ export { TDSTextField } from "./TDSTextField";
 export { TDSNumericSpinner } from "./TDSNumericSpinner";
 export { TDSListRow, TDSListRowTexts } from "./TDSListRow";
 export { TDSBottomNav } from "./TDSBottomNav";
+export { TDSBottomCTA, TDSBottomCTASingle, TDSBottomCTADouble } from "./TDSBottomCTA";

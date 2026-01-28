@@ -68,6 +68,25 @@ npm run dev
 
 ## Recent Changes
 
+- 2026-01-28: TDS 환경별 분기 적용 완료
+  - 모든 페이지에서 `isTossEnvironment()` 체크로 환경 분기
+  - Toss 환경: TDS 스타일 적용
+  - 일반 웹: 기존 원본 스타일 유지
+  
+  **TDS 래퍼 컴포넌트** (`src/components/tds/`):
+  - TDSButton, TDSBottomSheet, TDSLoader, TDSTextField
+  - TDSNumericSpinner, TDSListRow, TDSBottomNav, TDSBottomCTA
+  
+  **환경 분기 적용된 페이지**:
+  - Home.tsx (메인 버튼, 최근 비교 리스트)
+  - Analyzing.tsx (로딩, 에러 버튼)
+  - PriceConfirm.tsx (버튼, 입력 필드)
+  - Result.tsx (수량 스피너, 버튼)
+  - Dashboard.tsx (리스트)
+  - Profile.tsx (버튼)
+  - AppShell.tsx (하단 네비게이션)
+  - ImageSourceSheet.tsx (바텀시트, 버튼)
+
 - 2026-01-28: UI 전면 개편 (스크린샷 기준 디자인)
   - Result 페이지: 수량 선택기, 가격 비교 테이블, 절약 금액 표시
   - PriceConfirm 페이지: 이미지 상단 배치, 통화 기호 표시

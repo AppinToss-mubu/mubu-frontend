@@ -11,7 +11,7 @@ import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { useToss } from "../hooks/useToss";
 import { usePriceStore } from "../store/priceStore";
 import { isTossEnvironment } from "../utils/env";
-import { TDSButton } from "../components/tds";
+import { TDSButton, TDSListRow } from "../components/tds";
 
 function Home() {
   const navigate = useNavigate();
@@ -95,10 +95,6 @@ function Home() {
     cameraInputRef.current?.click();
   };
 
-  const isMobileWeb = useMemo(() => {
-    if (typeof navigator === "undefined") return false;
-    return /iPhone|Android|Mobile/i.test(navigator.userAgent);
-  }, []);
 
   return (
     <div>
@@ -248,60 +244,98 @@ function Home() {
               아직 비교한 기록이 없어요.
             </div>
           ) : (
-            recent.slice(0, 3).map((r) => (
-              <div
-                key={r.id}
-                onClick={() => navigate(`/result/${r.id}`)}
-                role="button"
-                tabIndex={0}
-                style={{
-                  padding: 16,
-                  borderRadius: 16,
-                  border: "1px solid var(--border)",
-                  background: "var(--bg)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  cursor: "pointer",
-                }}
-              >
-                <div style={{ minWidth: 0 }}>
+            recent.slice(0, 3).map((r) =>
+              isTossEnvironment() ? (
+                <TDSListRow
+                  key={r.id}
+                  onClick={() => navigate(`/result/${r.id}`)}
+                  withArrow
+                  border="none"
+                  contents={
+                    <TDSListRow.Texts
+                      type="2RowTypeA"
+                      top={r.productName}
+                      bottom="최저가 비교"
+                    />
+                  }
+                  right={
+                    <div
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 999,
+                        background: r.savedAmount >= 0 ? "#E8F3FF" : "#F2F4F6",
+                        color: r.savedAmount >= 0 ? "#3182F6" : "#8B95A1",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {r.savedAmount >= 0 ? "+" : "-"}
+                      {new Intl.NumberFormat("ko-KR").format(Math.abs(r.savedAmount))}원
+                    </div>
+                  }
+                  style={{
+                    padding: 16,
+                    borderRadius: 16,
+                    border: "1px solid #F2F4F6",
+                    background: "#FFFFFF",
+                  }}
+                />
+              ) : (
+                <div
+                  key={r.id}
+                  onClick={() => navigate(`/result/${r.id}`)}
+                  role="button"
+                  tabIndex={0}
+                  style={{
+                    padding: 16,
+                    borderRadius: 16,
+                    border: "1px solid var(--border)",
+                    background: "var(--bg)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {r.productName}
+                    </div>
+                    <div style={{ marginTop: 6, color: "var(--muted)" }}>
+                      최저가 비교
+                    </div>
+                  </div>
+
                   <div
                     style={{
+                      padding: "8px 12px",
+                      borderRadius: 12,
+                      background:
+                        r.savedAmount >= 0 ? "var(--chip-bg)" : "var(--card)",
+                      color:
+                        r.savedAmount >= 0 ? "var(--chip-fg)" : "var(--muted)",
                       fontWeight: 800,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {r.productName}
-                  </div>
-                  <div style={{ marginTop: 6, color: "var(--muted)" }}>
-                    최저가 비교
+                    {r.savedAmount >= 0 ? "+" : "-"}
+                    {new Intl.NumberFormat("ko-KR").format(
+                      Math.abs(r.savedAmount),
+                    )}
+                    원
                   </div>
                 </div>
-
-                <div
-                  style={{
-                    padding: "8px 12px",
-                    borderRadius: 12,
-                    background:
-                      r.savedAmount >= 0 ? "var(--chip-bg)" : "var(--card)",
-                    color:
-                      r.savedAmount >= 0 ? "var(--chip-fg)" : "var(--muted)",
-                    fontWeight: 800,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {r.savedAmount >= 0 ? "+" : "-"}
-                  {new Intl.NumberFormat("ko-KR").format(
-                    Math.abs(r.savedAmount),
-                  )}
-                  원
-                </div>
-              </div>
-            ))
+              )
+            )
           )}
         </div>
       </div>
