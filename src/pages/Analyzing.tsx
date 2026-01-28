@@ -12,8 +12,9 @@ import { usePriceStore } from "../store/priceStore";
 function Analyzing() {
   const navigate = useNavigate();
   const { pendingFile, setImageId, setCompareResult, setPendingFile } = usePriceStore();
-  const { mutate: compareWithImage, error } = useCompareWithImage();
+  const { mutate: compareWithImage } = useCompareWithImage();
   const [statusText, setStatusText] = useState("가격표를 찾는 중...");
+  const [localError, setLocalError] = useState<Error | null>(null);
   const hasStartedRef = useRef(false);
   const isNavigatingRef = useRef(false);
 
@@ -54,6 +55,7 @@ function Analyzing() {
       onError: (err) => {
         clearInterval(interval);
         console.error("분석 실패:", err);
+        setLocalError(err as Error);
       },
     });
 
@@ -70,7 +72,7 @@ function Analyzing() {
     return null;
   }
 
-  if (!pendingFile && !error) {
+  if (!pendingFile && !localError) {
     return null;
   }
 
@@ -113,7 +115,7 @@ function Analyzing() {
           padding: 20,
         }}
       >
-        {error ? (
+        {localError ? (
           <>
             <div
               style={{
@@ -134,7 +136,7 @@ function Analyzing() {
                 분석 실패
               </div>
               <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24 }}>
-                {error.message || "상품 분석에 실패했습니다."}
+                {localError.message || "상품 분석에 실패했습니다."}
               </div>
               <button
                 onClick={handleClose}
