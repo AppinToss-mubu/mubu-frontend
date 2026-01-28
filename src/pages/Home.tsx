@@ -259,7 +259,7 @@ function Home() {
         onClose={() => setIsSheetOpen(false)}
         onPickCamera={openCameraFromSheet}
         onPickAlbum={openAlbum}
-        showCamera={isTossAvailable || isMobileWeb}
+        showCamera={true}
       />
     </div>
   );

@@ -128,13 +128,17 @@ export function ImageSourceSheet({
                   marginBottom: 16,
                 }}
               >
-                <span style={{ fontSize: 28 }}>📷</span>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
               </div>
               <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-                카메라 시작 중...
+                상품 촬영하기
               </div>
-              <div style={{ fontSize: 13, color: "var(--muted)", textAlign: "center" }}>
-                권한 요청이 표시되면 허용을 선택해주세요
+              <div style={{ fontSize: 13, color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
+                가격표가 보이도록 상품을 촬영해주세요<br />
+                (Android/iOS 모두 지원)
               </div>
             </>
           ) : (
@@ -151,13 +155,17 @@ export function ImageSourceSheet({
                   marginBottom: 16,
                 }}
               >
-                <span style={{ fontSize: 28 }}>🖼️</span>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21,15 16,10 5,21"/>
+                </svg>
               </div>
               <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-                이미지 업로드
+                앨범에서 선택
               </div>
-              <div style={{ fontSize: 13, color: "var(--muted)", textAlign: "center" }}>
-                앨범에서 상품 이미지를 선택해주세요
+              <div style={{ fontSize: 13, color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
+                갤러리에서 상품 이미지를 선택해주세요
               </div>
             </>
           )}
@@ -196,7 +204,12 @@ export function ImageSourceSheet({
               gap: 6,
             }}
           >
-            <span>⬆</span> 업로드
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21,15 16,10 5,21"/>
+            </svg>
+            앨범
           </button>
           {showCamera && (
             <button
@@ -221,7 +234,11 @@ export function ImageSourceSheet({
                 gap: 6,
               }}
             >
-              <span>📷</span> 촬영
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              촬영
             </button>
           )}
         </div>
