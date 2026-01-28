@@ -15,7 +15,14 @@ export default function Profile() {
   if (isToss) {
     return (
       <div style={{ padding: 20 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: "#191F28" }}>
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            marginBottom: 8,
+            color: "#191F28",
+          }}
+        >
           프로필
         </h1>
         <p style={{ color: "#8B95A1", marginBottom: 32 }}>
@@ -44,17 +51,40 @@ export default function Profile() {
               margin: "0 auto 20px",
             }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B95A1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#8B95A1"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, color: "#191F28" }}>
+          <div
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              marginBottom: 8,
+              color: "#191F28",
+            }}
+          >
             로그인이 필요해요
           </div>
-          <p style={{ fontSize: 14, color: "#8B95A1", marginBottom: 24, lineHeight: 1.6 }}>
-            지금은 로그인 없이 사용할 수 있어요<br />
-            곧 로그인 기능이 추가될 예정이에요!
+          <p
+            style={{
+              fontSize: 14,
+              color: "#8B95A1",
+              marginBottom: 24,
+              lineHeight: 1.6,
+            }}
+          >
+            지금은 로그인 없이 사용할 수 있어요
+            <br />곧 로그인 기능이 추가될 예정이에요!
           </p>
           <TDSButton
             onClick={() => navigate("/")}
@@ -98,17 +128,33 @@ export default function Profile() {
             margin: "0 auto 20px",
           }}
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--muted)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
           로그인이 필요해요
         </div>
-        <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24, lineHeight: 1.6 }}>
-          지금은 로그인 없이 사용할 수 있어요<br />
-          곧 로그인 기능이 추가될 예정이에요!
+        <p
+          style={{
+            fontSize: 14,
+            color: "var(--muted)",
+            marginBottom: 24,
+            lineHeight: 1.6,
+          }}
+        >
+          지금은 로그인 없이 사용할 수 있어요
+          <br />곧 로그인 기능이 추가될 예정이에요!
         </p>
         <button
           onClick={() => navigate("/")}

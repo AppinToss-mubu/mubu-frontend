@@ -13,7 +13,8 @@ import { isTossEnvironment } from "../utils/env";
 
 function Analyzing() {
   const navigate = useNavigate();
-  const { pendingFile, setImageId, setCompareResult, setPendingFile } = usePriceStore();
+  const { pendingFile, setImageId, setCompareResult, setPendingFile } =
+    usePriceStore();
   const { mutateAsync: compareWithImage } = useCompareWithImage();
   const [statusText, setStatusText] = useState("가격표를 찾는 중...");
   const [localError, setLocalError] = useState<Error | null>(null);
@@ -46,20 +47,20 @@ function Analyzing() {
     }, 2000);
 
     console.log("[Analyzing] API 호출 시작");
-    
+
     compareWithImage(pendingFile)
       .then((data) => {
         console.log("[Analyzing] 성공! data:", data);
         clearInterval(interval);
         isNavigatingRef.current = true;
-        
+
         const targetUrl = `/price-confirm/${data.imageId}`;
         console.log("[Analyzing] 네비게이션 시작:", targetUrl);
-        
+
         setImageId(data.imageId);
         setCompareResult(data);
         setPendingFile(null);
-        
+
         console.log("[Analyzing] store 업데이트 완료, navigate 호출");
         navigate(targetUrl);
       })
@@ -69,8 +70,8 @@ function Analyzing() {
         console.error("분석 실패:", err);
         const errorMessage = err?.message || "";
         if (
-          errorMessage.includes("429") || 
-          errorMessage.includes("Too Many") || 
+          errorMessage.includes("429") ||
+          errorMessage.includes("Too Many") ||
           errorMessage.includes("RESOURCE_EXHAUSTED") ||
           errorMessage.includes("서버 오류")
         ) {
@@ -80,7 +81,14 @@ function Analyzing() {
       });
 
     return () => clearInterval(interval);
-  }, [pendingFile, compareWithImage, setImageId, setCompareResult, setPendingFile, navigate]);
+  }, [
+    pendingFile,
+    compareWithImage,
+    setImageId,
+    setCompareResult,
+    setPendingFile,
+    navigate,
+  ]);
 
   const handleClose = () => {
     setPendingFile(null);
@@ -149,20 +157,44 @@ function Analyzing() {
                 justifyContent: "center",
               }}
             >
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              <svg
+                width="36"
+                height="36"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--muted)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "var(--fg)" }}>
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  marginBottom: 12,
+                  color: "var(--fg)",
+                }}
+              >
                 분석 실패
               </div>
-              <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 28, lineHeight: 1.8 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  color: "var(--muted)",
+                  marginBottom: 28,
+                  lineHeight: 1.8,
+                }}
+              >
                 {isRateLimited ? (
                   <>
-                    무료버전은 요청이 많으면 쉬어가야해요 ㅠㅠ<br />
+                    무료버전은 요청이 많으면 쉬어가야해요 ㅠㅠ
+                    <br />
                     30초 정도 기다려주세요
                   </>
                 ) : (
@@ -175,7 +207,7 @@ function Analyzing() {
                     setPendingFile(null);
                     navigate("/?open=1");
                   }}
-                  color="dark"
+                  color="primary"
                   variant="fill"
                   size="large"
                 >
@@ -206,8 +238,8 @@ function Analyzing() {
         ) : (
           <>
             {isTossEnvironment() ? (
-              <TDSLoader 
-                size="large" 
+              <TDSLoader
+                size="large"
                 label={`AI가 상품을 분석하고 있습니다\n${statusText}`}
               />
             ) : (
@@ -239,7 +271,9 @@ function Analyzing() {
                   <span style={{ fontSize: 32 }}>🔍</span>
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+                  <div
+                    style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}
+                  >
                     AI가 상품을 분석하고 있습니다
                   </div>
                   <div style={{ fontSize: 14, color: "var(--muted)" }}>

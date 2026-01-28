@@ -96,7 +96,7 @@ function PriceConfirm() {
   }
 
   const currencySymbol = getCurrencySymbol(
-    compareResult.localCurrency || editCurrency
+    compareResult.localCurrency || editCurrency,
   );
   const hasAiPrice =
     compareResult.localPrice != null && compareResult.localCurrency;
@@ -235,10 +235,20 @@ function PriceConfirm() {
             >
               {isTossEnvironment() ? (
                 <>
-                  <TDSButton onClick={handleEdit} color="light" variant="weak" size="large" style={{ border: "1px solid var(--border)" }}>
+                  <TDSButton
+                    onClick={handleEdit}
+                    color="primary"
+                    variant="weak"
+                    size="large"
+                  >
                     <span>✎</span> 수정
                   </TDSButton>
-                  <TDSButton onClick={handleConfirm} color="dark" variant="fill" size="large">
+                  <TDSButton
+                    onClick={handleConfirm}
+                    color="primary"
+                    variant="fill"
+                    size="large"
+                  >
                     <span>✓</span> 맞아요
                   </TDSButton>
                 </>
@@ -365,7 +375,14 @@ function PriceConfirm() {
                 />
               ) : (
                 <>
-                  <label style={{ display: "block", fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 13,
+                      color: "var(--muted)",
+                      marginBottom: 8,
+                    }}
+                  >
                     가격
                   </label>
                   <input
@@ -396,11 +413,24 @@ function PriceConfirm() {
 
             {isTossEnvironment() ? (
               <>
-                <TDSButton onClick={handleEditSubmit} color="dark" variant="fill" size="xlarge" display="full">
+                <TDSButton
+                  onClick={handleEditSubmit}
+                  color="primary"
+                  variant="fill"
+                  size="xlarge"
+                  display="full"
+                >
                   확인
                 </TDSButton>
                 {editMode && (
-                  <TDSButton onClick={() => setEditMode(false)} color="light" variant="weak" size="large" display="full" style={{ marginTop: 12, border: "1px solid var(--border)" }}>
+                  <TDSButton
+                    onClick={() => setEditMode(false)}
+                    color="primary"
+                    variant="weak"
+                    size="large"
+                    display="full"
+                    style={{ marginTop: 12 }}
+                  >
                     취소
                   </TDSButton>
                 )}

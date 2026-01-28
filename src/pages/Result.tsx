@@ -51,7 +51,7 @@ function Result() {
     localPrice,
     currency,
     priceSource,
-    localPrice !== null
+    localPrice !== null,
   );
 
   useEffect(() => {
@@ -193,7 +193,14 @@ function Result() {
               >
                 −
               </button>
-              <span style={{ fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: "center" }}>
+              <span
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  minWidth: 24,
+                  textAlign: "center",
+                }}
+              >
                 {quantity}
               </span>
               <button
@@ -233,9 +240,14 @@ function Result() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>현지 단가</div>
+            <div
+              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+            >
+              현지 단가
+            </div>
             <div style={{ fontSize: 20, fontWeight: 700 }}>
-              {localUnitPrice.toLocaleString()}{currencySymbol}
+              {localUnitPrice.toLocaleString()}
+              {currencySymbol}
             </div>
           </div>
           <div
@@ -246,7 +258,11 @@ function Result() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>한국 단가</div>
+            <div
+              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+            >
+              한국 단가
+            </div>
             <div style={{ fontSize: 20, fontWeight: 700 }}>
               {hasKoreaPrice ? `₩${formatCurrency(koreaUnitPrice)}` : "₩0"}
             </div>
@@ -268,9 +284,14 @@ function Result() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>현지 총액</div>
+            <div
+              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+            >
+              현지 총액
+            </div>
             <div style={{ fontSize: 18, fontWeight: 700 }}>
-              {localTotal.toLocaleString()}{currencySymbol}
+              {localTotal.toLocaleString()}
+              {currencySymbol}
             </div>
             <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
               ₩{formatCurrency(localTotalKrw)}
@@ -284,7 +305,11 @@ function Result() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>한국 총액</div>
+            <div
+              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+            >
+              한국 총액
+            </div>
             <div style={{ fontSize: 18, fontWeight: 700 }}>
               {hasKoreaPrice ? `₩${formatCurrency(koreaTotal)}` : "₩0"}
             </div>
@@ -347,7 +372,8 @@ function Result() {
               lineHeight: 1.6,
             }}
           >
-            이 상품은 한국에서 판매되지 않거나<br />
+            이 상품은 한국에서 판매되지 않거나
+            <br />
             정확히 일치하는 상품을 찾지 못했어요
           </div>
           <div
@@ -360,8 +386,14 @@ function Result() {
               color: "#78350f",
             }}
           >
-            💡 현지에서 구매하시는 걸 추천해요!<br />
-            현지가: <strong>{localTotal.toLocaleString()}{currencySymbol}</strong> (약 ₩{formatCurrency(localTotalKrw)})
+            💡 현지에서 구매하시는 걸 추천해요!
+            <br />
+            현지가:{" "}
+            <strong>
+              {localTotal.toLocaleString()}
+              {currencySymbol}
+            </strong>{" "}
+            (약 ₩{formatCurrency(localTotalKrw)})
           </div>
         </div>
       ) : (
@@ -370,11 +402,12 @@ function Result() {
             marginTop: 16,
             padding: 24,
             borderRadius: 16,
-            background: savedTotal > 0
-              ? "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)"
-              : savedTotal < 0
-              ? "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)"
-              : "var(--card)",
+            background:
+              savedTotal > 0
+                ? "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)"
+                : savedTotal < 0
+                  ? "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)"
+                  : "var(--card)",
             textAlign: "center",
           }}
         >
@@ -391,7 +424,12 @@ function Result() {
             style={{
               fontSize: 28,
               fontWeight: 800,
-              color: savedTotal > 0 ? "#0369a1" : savedTotal < 0 ? "#15803d" : "var(--fg)",
+              color:
+                savedTotal > 0
+                  ? "#0369a1"
+                  : savedTotal < 0
+                    ? "#15803d"
+                    : "var(--fg)",
             }}
           >
             {`${Math.abs(savedTotal).toLocaleString()}원`}
@@ -406,8 +444,8 @@ function Result() {
             {savedTotal > 0
               ? "한국에서 사는 것이 더 저렴해요"
               : savedTotal < 0
-              ? "현지에서 사는 것이 더 저렴해요"
-              : "한국과 현지 가격이 동일해요"}
+                ? "현지에서 사는 것이 더 저렴해요"
+                : "한국과 현지 가격이 동일해요"}
           </div>
         </div>
       )}
@@ -423,10 +461,22 @@ function Result() {
         >
           {isTossEnvironment() ? (
             <>
-              <TDSButton onClick={handleViewKoreaPrice} disabled={!externalLinkUrl} color="light" variant="weak" size="large" style={{ border: "1px solid var(--border)" }}>
+              <TDSButton
+                onClick={handleViewKoreaPrice}
+                disabled={!externalLinkUrl}
+                color="primary"
+                variant="weak"
+                size="large"
+              >
                 <span>↗</span> 한국가격 보기
               </TDSButton>
-              <TDSButton onClick={handlePurchase} disabled={!externalLinkUrl} color="dark" variant="fill" size="large">
+              <TDSButton
+                onClick={handlePurchase}
+                disabled={!externalLinkUrl}
+                color="primary"
+                variant="fill"
+                size="large"
+              >
                 <span>✓</span> 구매함
               </TDSButton>
             </>
@@ -480,7 +530,13 @@ function Result() {
       ) : (
         <div style={{ marginTop: 16 }}>
           {isTossEnvironment() ? (
-            <TDSButton onClick={() => navigate("/")} color="dark" variant="fill" size="large" display="full">
+            <TDSButton
+              onClick={() => navigate("/")}
+              color="primary"
+              variant="fill"
+              size="large"
+              display="full"
+            >
               다른 상품 비교하기
             </TDSButton>
           ) : (
@@ -522,7 +578,8 @@ function Result() {
           ⓘ 해당 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다
         </p>
         <p style={{ margin: 0 }}>
-          ※ 가격 및 환율은 실시간 변동 가능하며, 동일 모델/옵션 기준으로 비교되었습니다
+          ※ 가격 및 환율은 실시간 변동 가능하며, 동일 모델/옵션 기준으로
+          비교되었습니다
         </p>
       </div>
     </div>

@@ -38,14 +38,14 @@ const renderApp = async () => {
         <TDSMobileAITProvider>
           <AppWithProviders />
         </TDSMobileAITProvider>
-      </StrictMode>
+      </StrictMode>,
     );
   } else {
     // 일반 웹 환경
     root.render(
       <StrictMode>
         <AppWithProviders />
-      </StrictMode>
+      </StrictMode>,
     );
   }
 };
