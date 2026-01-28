@@ -41,16 +41,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div
-          className={`navItem ${active("/dashboard") ? "navItemActive" : ""}`}
-          onClick={() => navigate("/dashboard")}
-          role="button"
-          tabIndex={0}
-        >
-          <div>≋</div>
-          <div>대시보드</div>
-        </div>
-
-        <div
           className="cameraFab"
           onClick={() => navigate("/?open=1")}
           role="button"
