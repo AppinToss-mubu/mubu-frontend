@@ -22,6 +22,7 @@ const getCurrencySymbol = (currency: string): string => {
     IDR: "Rp",
     HKD: "HK$",
     TWD: "NT$",
+    AUD: "A$",
   };
   return symbols[currency.toUpperCase()] || currency;
 };
@@ -319,6 +320,7 @@ function PriceConfirm() {
                 <option value="THB">THB (฿) - 태국 바트</option>
                 <option value="JPY">JPY (¥) - 일본 엔</option>
                 <option value="USD">USD ($) - 미국 달러</option>
+                <option value="AUD">AUD (A$) - 호주 달러</option>
                 <option value="CNY">CNY (¥) - 중국 위안</option>
                 <option value="EUR">EUR (€) - 유로</option>
                 <option value="SGD">SGD (S$) - 싱가포르 달러</option>
@@ -341,36 +343,28 @@ function PriceConfirm() {
               >
                 가격
               </label>
-              <div style={{ position: "relative" }}>
-                <span
-                  style={{
-                    position: "absolute",
-                    left: 16,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    fontSize: 18,
-                    color: "var(--muted)",
-                  }}
-                >
-                  {getCurrencySymbol(editCurrency)}
-                </span>
-                <input
-                  type="number"
-                  value={editPrice}
-                  onChange={(e) => setEditPrice(e.target.value)}
-                  placeholder="0"
-                  style={{
-                    width: "100%",
-                    padding: "14px 16px 14px 40px",
-                    borderRadius: 12,
-                    border: "1px solid var(--border)",
-                    backgroundColor: "var(--bg)",
-                    fontSize: 18,
-                    color: "var(--fg)",
-                    boxSizing: "border-box",
-                  }}
-                />
-              </div>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={editPrice}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                    setEditPrice(val);
+                  }
+                }}
+                placeholder="0"
+                style={{
+                  width: "100%",
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--bg)",
+                  fontSize: 18,
+                  color: "var(--fg)",
+                  boxSizing: "border-box",
+                }}
+              />
             </div>
 
             <button
