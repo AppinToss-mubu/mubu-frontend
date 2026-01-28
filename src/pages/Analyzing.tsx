@@ -140,34 +140,28 @@ function Analyzing() {
                 width: 80,
                 height: 80,
                 borderRadius: "50%",
-                backgroundColor: isRateLimited ? "#fef3c7" : "#fee2e2",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              {isRateLimited ? (
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12,6 12,12 16,14"/>
-                </svg>
-              ) : (
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="12"/>
-                  <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-              )}
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: isRateLimited ? "#b45309" : "#b91c1c" }}>
-                {isRateLimited ? "잠시 쉬어가요" : "분석 실패"}
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "var(--fg)" }}>
+                분석 실패
               </div>
               <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 28, lineHeight: 1.8 }}>
                 {isRateLimited ? (
                   <>
-                    무료 버전은 요청이 많으면 잠시 쉬어야 해요 ㅠㅠ<br />
-                    30초 후에 다시 시도해주세요!
+                    요청이 많아 잠시 후 다시 시도해주세요<br />
+                    30초 정도 기다려주세요
                   </>
                 ) : (
                   localError.message || "상품 분석에 실패했습니다."
