@@ -38,12 +38,26 @@ export const compareWithImageAPI = async (
     body: formData,
   });
 
+  const json = await response.json().catch(() => ({}));
+  
+  // 400 에러지만 상품 정보가 있으면 (한국 가격만 못 찾은 경우) 결과 반환
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "가격 비교 실패");
+    // 상품 정보는 있지만 한국 가격을 못 찾은 경우
+    if (json.productName) {
+      return {
+        imageId: json.imageId || clientImageId,
+        aiText: json.aiText || "",
+        productName: json.productName,
+        lowestPrice: 0,
+        mallName: "",
+        link: "",
+        image: "",
+        localPrice: json.localPrice,
+        localCurrency: json.localCurrency,
+      } as PriceCompareResult;
+    }
+    throw new Error(json.message || "가격 비교 실패");
   }
-
-  const json = await response.json();
 
   // 서버에서 imageId를 내려주지 않더라도, 클라이언트에서 생성한 값을 보정해서 사용
   return {

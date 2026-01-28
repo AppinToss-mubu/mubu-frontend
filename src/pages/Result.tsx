@@ -315,7 +315,9 @@ function Result() {
             marginTop: 16,
             padding: 24,
             borderRadius: 16,
-            background: savedTotal > 0
+            background: !hasKoreaPrice
+              ? "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)"
+              : savedTotal > 0
               ? "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)"
               : savedTotal < 0
               ? "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)"
@@ -330,16 +332,16 @@ function Result() {
               marginBottom: 4,
             }}
           >
-            {savedTotal > 0 ? "−" : savedTotal < 0 ? "+" : "−"} 총 절약
+            {hasKoreaPrice ? (savedTotal > 0 ? "−" : savedTotal < 0 ? "+" : "−") + " 총 절약" : "−  총 절약"}
           </div>
           <div
             style={{
               fontSize: 28,
               fontWeight: 800,
-              color: savedTotal > 0 ? "#0369a1" : savedTotal < 0 ? "#15803d" : "var(--fg)",
+              color: !hasKoreaPrice ? "#6b7280" : savedTotal > 0 ? "#0369a1" : savedTotal < 0 ? "#15803d" : "var(--fg)",
             }}
           >
-            {Math.abs(savedTotal).toLocaleString()}원
+            {hasKoreaPrice ? `${Math.abs(savedTotal).toLocaleString()}원` : "0원"}
           </div>
           <div
             style={{
@@ -348,13 +350,13 @@ function Result() {
               marginTop: 8,
             }}
           >
-            {savedTotal > 0
+            {!hasKoreaPrice
+              ? "한국에서 구할 수 없는걸 수도"
+              : savedTotal > 0
               ? "한국에서 사는 것이 더 저렴해요"
               : savedTotal < 0
               ? "현지에서 사는 것이 더 저렴해요"
-              : hasKoreaPrice
-              ? "한국과 현지 가격이 동일해요"
-              : "한국에서 구할 수 없는걸 수도"}
+              : "한국과 현지 가격이 동일해요"}
           </div>
         </div>
       )}
