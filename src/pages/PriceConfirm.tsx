@@ -1,13 +1,30 @@
 /**
  * 가격 확인 페이지 (PriceConfirm)
- * - AI가 감지한 가격을 보여주고 사용자가 확인/수정하는 중간 단계
- * - 확인 후 Result 페이지로 이동하여 최종 결과 표시
+ * - 스크린샷 4번 기준 UI
+ * - 상품 이미지 상단, 감지된 가격 카드, 수정/맞아요 버튼
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { PriceInput } from "../components/PriceInput";
 import { usePriceStore } from "../store/priceStore";
+
+const getCurrencySymbol = (currency: string): string => {
+  const symbols: Record<string, string> = {
+    THB: "฿",
+    JPY: "¥",
+    USD: "$",
+    CNY: "¥",
+    EUR: "€",
+    KRW: "₩",
+    SGD: "S$",
+    VND: "₫",
+    PHP: "₱",
+    IDR: "Rp",
+    HKD: "HK$",
+    TWD: "NT$",
+  };
+  return symbols[currency.toUpperCase()] || currency;
+};
 
 function PriceConfirm() {
   const { imageId } = useParams<{ imageId: string }>();
@@ -15,250 +32,384 @@ function PriceConfirm() {
   const { compareResult, setLocalPrice, setCurrency, setPriceSource } =
     usePriceStore();
 
-  // imageId가 없거나 compareResult가 없으면 홈으로 리다이렉트
+  const [editMode, setEditMode] = useState(false);
+  const [editPrice, setEditPrice] = useState("");
+  const [editCurrency, setEditCurrency] = useState("THB");
+
   useEffect(() => {
     if (!imageId || imageId === "undefined") {
       navigate("/");
       return;
     }
     if (!compareResult) {
-      // compareResult가 없으면 홈으로 돌아가기 (에러가 발생했거나 세션이 만료된 경우)
       navigate("/");
     }
   }, [imageId, compareResult, navigate]);
 
-  const handlePriceConfirm = (price: number, selectedCurrency: string) => {
-    // AI가 인식한 가격/통화와 동일하면 priceSource를 AI로, 아니면 USER로 설정
-    const fromAi =
-      compareResult?.localPrice != null &&
-      compareResult?.localCurrency &&
-      Math.abs(compareResult.localPrice - Math.round(price)) < 1 &&
-      compareResult.localCurrency.toUpperCase() === selectedCurrency.toUpperCase();
+  useEffect(() => {
+    if (compareResult?.localPrice != null) {
+      setEditPrice(compareResult.localPrice.toString());
+    }
+    if (compareResult?.localCurrency) {
+      setEditCurrency(compareResult.localCurrency);
+    }
+  }, [compareResult]);
+
+  const handleConfirm = () => {
+    if (!compareResult) return;
+
+    const price = compareResult.localPrice!;
+    const curr = compareResult.localCurrency!;
 
     setLocalPrice(price);
-    setCurrency(selectedCurrency);
-    setPriceSource(fromAi ? "AI" : "USER");
-
-    // 가격 확인 후 Result 페이지로 이동
+    setCurrency(curr);
+    setPriceSource("AI");
     navigate(`/result/${imageId}`);
+  };
+
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
+  const handleEditSubmit = () => {
+    const price = parseFloat(editPrice);
+    if (isNaN(price) || price <= 0) {
+      alert("올바른 가격을 입력해주세요.");
+      return;
+    }
+
+    setLocalPrice(price);
+    setCurrency(editCurrency);
+    setPriceSource("USER");
+    navigate(`/result/${imageId}`);
+  };
+
+  const handleClose = () => {
+    navigate("/");
   };
 
   if (!compareResult) {
     return null;
   }
 
+  const currencySymbol = getCurrencySymbol(
+    compareResult.localCurrency || editCurrency
+  );
+  const hasAiPrice =
+    compareResult.localPrice != null && compareResult.localCurrency;
+
   return (
-    <div>
-      {/* 뒤로가기 버튼 */}
-      <div style={{ marginTop: 8, marginBottom: 8 }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "var(--bg)" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "16px 20px",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>가격 확인</h1>
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleClose}
           style={{
             background: "transparent",
             border: "none",
-            fontSize: 20,
+            fontSize: 24,
             cursor: "pointer",
-            color: "var(--fg)",
-            padding: "4px 8px",
-            display: "flex",
-            alignItems: "center",
+            color: "var(--muted)",
+            padding: 4,
           }}
-          aria-label="뒤로가기"
+          aria-label="닫기"
         >
-          ←
+          ×
         </button>
       </div>
 
-      <div style={{ marginTop: 10 }}>
-        <div style={{ fontSize: 18, color: "var(--muted)" }}>가격 확인</div>
-        <div style={{ fontSize: 24, fontWeight: 800, marginTop: 6 }}>
-          현지 가격을 확인해주세요
-        </div>
-        <div
-          style={{
-            fontSize: 14,
-            color: "var(--muted)",
-            marginTop: 10,
-            lineHeight: 1.6,
-          }}
-        >
-          AI가 인식한 가격이 맞는지 확인하거나 수정해주세요.
-        </div>
-      </div>
-
-      {/* 상품 정보 카드 */}
-      <div
-        style={{
-          marginTop: 18,
-          marginBottom: 18,
-          padding: 16,
-          borderRadius: 16,
-          border: "1px solid var(--border)",
-          background: "var(--card)",
-        }}
-      >
-        <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
-          인식된 상품
-        </div>
-        <div
-          style={{
-            fontSize: 16,
-            fontWeight: 700,
-            color: "var(--fg)",
-            padding: "12px",
-            borderRadius: 8,
-            background: "var(--bg)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          {compareResult.productName || "상품명을 인식하지 못했습니다"}
-        </div>
+      <div style={{ padding: "0 20px" }}>
         {compareResult.image && (
-          <div style={{ marginTop: 12 }}>
+          <div
+            style={{
+              marginTop: 20,
+              borderRadius: 16,
+              overflow: "hidden",
+              border: "1px solid var(--border)",
+            }}
+          >
             <img
               src={compareResult.image}
               alt={compareResult.productName}
               style={{
                 width: "100%",
-                maxHeight: 200,
+                height: 240,
                 objectFit: "cover",
-                borderRadius: 12,
               }}
             />
           </div>
         )}
-      </div>
 
-      {/* AI가 인식한 가격이 있는 경우 */}
-      {compareResult.localPrice != null && compareResult.localCurrency ? (
-        <div
-          style={{
-            marginTop: 16,
-            marginBottom: 16,
-            padding: 18,
-            borderRadius: 16,
-            border: "1px solid var(--border)",
-            background: "var(--bg)",
-          }}
-        >
-          <div
+        <div style={{ marginTop: 20 }}>
+          <h2
             style={{
-              fontSize: 13,
-              color: "var(--muted)",
-              marginBottom: 8,
+              fontSize: 18,
+              fontWeight: 700,
+              margin: 0,
+              marginBottom: 4,
+              color: "var(--fg)",
+              lineHeight: 1.4,
             }}
           >
-            감지된 가격
-          </div>
+            {compareResult.productName || "상품명 인식 실패"}
+          </h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: "var(--muted)",
+              margin: 0,
+            }}
+          >
+            {compareResult.mallName || ""}
+          </p>
+        </div>
+
+        {!editMode && hasAiPrice && (
           <div
             style={{
-              padding: 16,
-              borderRadius: 12,
-              background: "var(--card)",
+              marginTop: 24,
+              padding: 20,
+              borderRadius: 16,
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
             }}
           >
             <div
               style={{
-                fontSize: 26,
-                fontWeight: 800,
-                marginBottom: 4,
+                fontSize: 13,
+                color: "var(--muted)",
+                marginBottom: 8,
               }}
             >
-              {compareResult.localPrice.toLocaleString()}{" "}
-              {compareResult.localCurrency}
+              감지된 가격
+            </div>
+            <div
+              style={{
+                fontSize: 36,
+                fontWeight: 800,
+                color: "var(--fg)",
+              }}
+            >
+              {currencySymbol}
+              {compareResult.localPrice?.toLocaleString()}
             </div>
             <div
               style={{
                 fontSize: 13,
                 color: "var(--muted)",
+                marginTop: 4,
+              }}
+            >
+              원본: {compareResult.localPrice?.toFixed(2)}
+            </div>
+
+            <div
+              style={{
+                textAlign: "center",
+                marginTop: 24,
+                marginBottom: 16,
+                fontSize: 14,
+                color: "var(--muted)",
               }}
             >
               이 가격이 맞나요?
             </div>
-          </div>
 
-          {/* 샘플 앱과 비슷한 버튼 구성: 수정 / 맞아요 */}
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              marginTop: 14,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                // 수정: 아래 입력 폼에서 다시 입력하도록 스크롤만 유도
-                const el = document.getElementById("price");
-                el?.scrollIntoView({ behavior: "smooth", block: "center" });
-                (el as HTMLInputElement | null)?.focus();
-              }}
+            <div
               style={{
-                flex: 1,
-                padding: "10px 12px",
-                borderRadius: 10,
-                border: "1px solid var(--border)",
-                background: "var(--card)",
-                color: "var(--fg)",
-                fontWeight: 700,
-                cursor: "pointer",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
               }}
             >
-              수정
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                // 맞아요: AI가 인식한 가격을 그대로 확정
-                handlePriceConfirm(
-                  compareResult.localPrice!,
-                  compareResult.localCurrency!
-                );
-              }}
+              <button
+                onClick={handleEdit}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--bg)",
+                  color: "var(--fg)",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span>✎</span> 수정
+              </button>
+              <button
+                onClick={handleConfirm}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "none",
+                  backgroundColor: "#1f2937",
+                  color: "#ffffff",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span>✓</span> 맞아요
+              </button>
+            </div>
+          </div>
+        )}
+
+        {(editMode || !hasAiPrice) && (
+          <div
+            style={{
+              marginTop: 24,
+              padding: 20,
+              borderRadius: 16,
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div
               style={{
-                flex: 1,
-                padding: "10px 12px",
-                borderRadius: 10,
+                fontSize: 13,
+                color: "var(--muted)",
+                marginBottom: 16,
+              }}
+            >
+              {hasAiPrice ? "가격 수정" : "가격을 직접 입력해주세요"}
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  color: "var(--muted)",
+                  marginBottom: 8,
+                }}
+              >
+                통화
+              </label>
+              <select
+                value={editCurrency}
+                onChange={(e) => setEditCurrency(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--bg)",
+                  fontSize: 16,
+                  color: "var(--fg)",
+                }}
+              >
+                <option value="THB">THB (฿) - 태국 바트</option>
+                <option value="JPY">JPY (¥) - 일본 엔</option>
+                <option value="USD">USD ($) - 미국 달러</option>
+                <option value="CNY">CNY (¥) - 중국 위안</option>
+                <option value="EUR">EUR (€) - 유로</option>
+                <option value="SGD">SGD (S$) - 싱가포르 달러</option>
+                <option value="VND">VND (₫) - 베트남 동</option>
+                <option value="PHP">PHP (₱) - 필리핀 페소</option>
+                <option value="IDR">IDR (Rp) - 인도네시아 루피아</option>
+                <option value="HKD">HKD (HK$) - 홍콩 달러</option>
+                <option value="TWD">TWD (NT$) - 대만 달러</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  color: "var(--muted)",
+                  marginBottom: 8,
+                }}
+              >
+                가격
+              </label>
+              <div style={{ position: "relative" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 16,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    fontSize: 18,
+                    color: "var(--muted)",
+                  }}
+                >
+                  {getCurrencySymbol(editCurrency)}
+                </span>
+                <input
+                  type="number"
+                  value={editPrice}
+                  onChange={(e) => setEditPrice(e.target.value)}
+                  placeholder="0"
+                  style={{
+                    width: "100%",
+                    padding: "14px 16px 14px 40px",
+                    borderRadius: 12,
+                    border: "1px solid var(--border)",
+                    backgroundColor: "var(--bg)",
+                    fontSize: 18,
+                    color: "var(--fg)",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleEditSubmit}
+              style={{
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 12,
                 border: "none",
-                background: "var(--primary)",
-                color: "var(--primary-contrast)",
-                fontWeight: 700,
+                backgroundColor: "#1f2937",
+                color: "#ffffff",
+                fontSize: 16,
+                fontWeight: 600,
                 cursor: "pointer",
               }}
             >
-              맞아요
+              확인
             </button>
-          </div>
-        </div>
-      ) : (
-        <div
-          style={{
-            marginTop: 16,
-            marginBottom: 16,
-            padding: 16,
-            borderRadius: 16,
-            border: "1px solid var(--border)",
-            background: "var(--card)",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 14,
-              color: "var(--muted)",
-            }}
-          >
-            AI가 가격을 인식하지 못했습니다. 직접 입력해주세요.
-          </div>
-        </div>
-      )}
 
-      {/* 가격 입력 폼 */}
-      <div style={{ marginTop: 24 }}>
-        <PriceInput
-          onSubmit={handlePriceConfirm}
-          initialPrice={compareResult.localPrice ?? null}
-          initialCurrency={compareResult.localCurrency ?? "JPY"}
-        />
+            {editMode && (
+              <button
+                onClick={() => setEditMode(false)}
+                style={{
+                  width: "100%",
+                  marginTop: 12,
+                  padding: "12px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "transparent",
+                  color: "var(--muted)",
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                취소
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

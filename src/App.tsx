@@ -15,7 +15,7 @@ function App() {
       <AppShell>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/analyzing/:imageId" element={<Analyzing />} />
+          <Route path="/analyzing" element={<Analyzing />} />
           <Route path="/price-confirm/:imageId" element={<PriceConfirm />} />
           <Route path="/result/:imageId" element={<Result />} />
           <Route path="/dashboard" element={<Dashboard />} />

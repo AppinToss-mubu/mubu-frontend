@@ -1,25 +1,45 @@
 /**
  * 결과 페이지 (Result)
- * - 가격 확인 후 최종 비교 결과를 보여주는 페이지
- * - 절약 금액/요약 문구/외부 링크 표시
+ * - 스크린샷 5번 기준 UI
+ * - 수량 선택기, 가격 비교 테이블, 절약 금액, 액션 버튼
  */
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { SummaryCard } from "../components/SummaryCard";
-import { ExternalLink } from "../components/ExternalLink";
 import { useSummary, useExternalLink } from "../hooks/usePriceCompare";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { usePriceStore } from "../store/priceStore";
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat("ko-KR").format(amount);
+};
+
+const getCurrencySymbol = (currency: string): string => {
+  const symbols: Record<string, string> = {
+    THB: "฿",
+    JPY: "¥",
+    USD: "$",
+    CNY: "¥",
+    EUR: "€",
+    KRW: "₩",
+    SGD: "S$",
+    VND: "₫",
+    PHP: "₱",
+    IDR: "Rp",
+    HKD: "HK$",
+    TWD: "NT$",
+  };
+  return symbols[currency.toUpperCase()] || currency;
+};
 
 function Result() {
   const { imageId } = useParams<{ imageId: string }>();
   const navigate = useNavigate();
   const { localPrice, currency, priceSource, compareResult } = usePriceStore();
   const [productName, setProductName] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
   const { add: addRecent } = useRecentComparisons();
 
-  // 가격이 입력되었을 때만 summary 쿼리 활성화
   const {
     data: summaryData,
     isLoading: isSummaryLoading,
@@ -32,7 +52,6 @@ function Result() {
     localPrice !== null
   );
 
-  // 요약 생성 성공 시 "최근 비교" 저장
   useEffect(() => {
     if (!summaryData) return;
     if (!imageId) return;
@@ -46,20 +65,14 @@ function Result() {
     });
   }, [addRecent, compareResult?.productName, imageId, summaryData]);
 
-  // compareResult에서 상품명 추출 (외부 링크용)
   useEffect(() => {
     if (compareResult?.productName) {
       setProductName(compareResult.productName);
     }
   }, [compareResult]);
 
-  // 외부 링크 쿼리 (상품명이 있을 때만 활성화)
-  const {
-    data: externalLinkUrl,
-    isLoading: isLinkLoading,
-  } = useExternalLink(productName, !!productName);
+  const { data: externalLinkUrl } = useExternalLink(productName, !!productName);
 
-  // imageId나 localPrice가 없으면 PriceConfirm으로 리다이렉트
   useEffect(() => {
     if (!imageId) {
       navigate("/");
@@ -70,97 +83,350 @@ function Result() {
     }
   }, [imageId, localPrice, navigate]);
 
-  if (localPrice === null) {
+  if (localPrice === null || !compareResult) {
     return null;
   }
 
+  const currencySymbol = getCurrencySymbol(currency);
+  const localUnitPrice = localPrice;
+  const koreaUnitPrice = summaryData?.koreaPrice || 0;
+  const localTotal = localUnitPrice * quantity;
+  const koreaTotal = koreaUnitPrice * quantity;
+  const localTotalKrw = (summaryData?.localPriceKrw || 0) * quantity;
+  const savedTotal = localTotalKrw - koreaTotal;
+  const hasKoreaPrice = koreaUnitPrice > 0;
+
+  const handleQuantityChange = (delta: number) => {
+    setQuantity((prev) => Math.max(1, prev + delta));
+  };
+
+  const handleViewKoreaPrice = () => {
+    if (externalLinkUrl) {
+      window.open(externalLinkUrl, "_blank");
+    }
+  };
+
+  const handlePurchase = () => {
+    if (externalLinkUrl) {
+      window.open(externalLinkUrl, "_blank");
+    }
+  };
+
   return (
-    <div>
-      <div style={{ marginTop: 18 }}>
-        <div style={{ fontSize: 18, color: "var(--muted)" }}>비교 결과</div>
-        <div style={{ fontSize: 24, fontWeight: 800, marginTop: 6 }}>
-          가격 비교 완료
+    <div style={{ paddingBottom: 100 }}>
+      <div
+        style={{
+          padding: 20,
+          borderRadius: 16,
+          backgroundColor: "var(--card)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            margin: 0,
+            marginBottom: 4,
+            color: "var(--fg)",
+          }}
+        >
+          {compareResult.productName}
+        </h2>
+        <p
+          style={{
+            fontSize: 13,
+            color: "var(--muted)",
+            margin: 0,
+          }}
+        >
+          출처: {hasKoreaPrice ? compareResult.mallName : "한국 가격 정보 없음"}
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 20,
+            marginTop: 20,
+            marginBottom: 20,
+          }}
+        >
+          <span style={{ fontSize: 14, color: "var(--muted)" }}>수량</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "8px 16px",
+              borderRadius: 24,
+              backgroundColor: "var(--bg)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <button
+              onClick={() => handleQuantityChange(-1)}
+              disabled={quantity <= 1}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                border: "1px solid var(--border)",
+                backgroundColor: "var(--card)",
+                fontSize: 18,
+                cursor: quantity > 1 ? "pointer" : "not-allowed",
+                opacity: quantity > 1 ? 1 : 0.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              −
+            </button>
+            <span style={{ fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: "center" }}>
+              {quantity}
+            </span>
+            <button
+              onClick={() => handleQuantityChange(1)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                border: "1px solid var(--border)",
+                backgroundColor: "var(--card)",
+                fontSize: 18,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginBottom: 16,
+          }}
+        >
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 12,
+              backgroundColor: "var(--bg)",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>현지 단가</div>
+            <div style={{ fontSize: 20, fontWeight: 700 }}>
+              {localUnitPrice.toLocaleString()}{currencySymbol}
+            </div>
+          </div>
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 12,
+              backgroundColor: "var(--bg)",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>한국 단가</div>
+            <div style={{ fontSize: 20, fontWeight: 700 }}>
+              {hasKoreaPrice ? `₩${formatCurrency(koreaUnitPrice)}` : "₩0"}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 12,
+              backgroundColor: "var(--bg)",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>현지 총액</div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>
+              {localTotal.toLocaleString()}{currencySymbol}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+              ₩{formatCurrency(localTotalKrw)}
+            </div>
+          </div>
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 12,
+              backgroundColor: "var(--bg)",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>한국 총액</div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>
+              {hasKoreaPrice ? `₩${formatCurrency(koreaTotal)}` : "₩0"}
+            </div>
+          </div>
         </div>
       </div>
 
       {summaryError && (
         <div
           style={{
-            marginTop: 18,
-            marginBottom: 12,
-            padding: 12,
+            marginTop: 16,
+            padding: 16,
             borderRadius: 12,
-            backgroundColor: "var(--danger-bg)",
-            color: "var(--danger-fg)",
-            border: "1px solid var(--border)",
+            backgroundColor: "#fee2e2",
+            color: "#b91c1c",
+            textAlign: "center",
           }}
         >
-          {summaryError.message || "요약 생성에 실패했습니다. 잠시 후 다시 시도해 주세요."}
+          {summaryError.message || "가격 비교에 실패했습니다."}
         </div>
       )}
 
-      {summaryData && (
-        <div style={{ marginTop: 18 }}>
-          <SummaryCard summary={summaryData} isLoading={isSummaryLoading} />
-        </div>
-      )}
-
-      {externalLinkUrl && (
-        <div style={{ marginTop: 18 }}>
-          <ExternalLink url={externalLinkUrl}>
-            <button
-              style={{
-                width: "100%",
-                padding: "14px 18px",
-                fontSize: 16,
-                borderRadius: 14,
-                border: "1px solid var(--border)",
-                backgroundColor: "#16a34a",
-                color: "#ffffff",
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-            >
-              {isLinkLoading ? "링크 준비 중..." : "네이버 쇼핑에서 보기"}
-            </button>
-          </ExternalLink>
-        </div>
-      )}
-
-      <div style={{ marginTop: 18 }}>
-        <button
-          onClick={() => navigate(`/price-confirm/${imageId}`)}
+      {isSummaryLoading ? (
+        <div
           style={{
-            width: "100%",
-            padding: "12px 18px",
-            fontSize: 15,
+            marginTop: 16,
+            padding: 24,
+            borderRadius: 16,
+            backgroundColor: "var(--card)",
+            textAlign: "center",
+          }}
+        >
+          계산 중...
+        </div>
+      ) : (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            borderRadius: 16,
+            background: savedTotal > 0
+              ? "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)"
+              : savedTotal < 0
+              ? "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)"
+              : "var(--card)",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 14,
+              color: "var(--muted)",
+              marginBottom: 4,
+            }}
+          >
+            {savedTotal > 0 ? "−" : savedTotal < 0 ? "+" : "−"} 총 절약
+          </div>
+          <div
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              color: savedTotal > 0 ? "#0369a1" : savedTotal < 0 ? "#15803d" : "var(--fg)",
+            }}
+          >
+            {Math.abs(savedTotal).toLocaleString()}원
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              color: "var(--muted)",
+              marginTop: 8,
+            }}
+          >
+            {savedTotal > 0
+              ? "한국에서 사는 것이 더 저렴해요"
+              : savedTotal < 0
+              ? "현지에서 사는 것이 더 저렴해요"
+              : hasKoreaPrice
+              ? "한국과 현지 가격이 동일해요"
+              : "한국에서 구할 수 없는걸 수도"}
+          </div>
+        </div>
+      )}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+          marginTop: 16,
+        }}
+      >
+        <button
+          onClick={handleViewKoreaPrice}
+          disabled={!externalLinkUrl}
+          style={{
+            padding: "14px 16px",
+            borderRadius: 12,
+            border: "1px solid var(--border)",
             backgroundColor: "var(--card)",
             color: "var(--fg)",
-            border: "1px solid var(--border)",
-            borderRadius: 14,
-            cursor: "pointer",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: externalLinkUrl ? "pointer" : "not-allowed",
+            opacity: externalLinkUrl ? 1 : 0.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
           }}
         >
-          가격 다시 입력하기
+          <span>↗</span> 한국가격 보기
+        </button>
+        <button
+          onClick={handlePurchase}
+          disabled={!externalLinkUrl}
+          style={{
+            padding: "14px 16px",
+            borderRadius: 12,
+            border: "none",
+            backgroundColor: "#1f2937",
+            color: "#ffffff",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: externalLinkUrl ? "pointer" : "not-allowed",
+            opacity: externalLinkUrl ? 1 : 0.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+          }}
+        >
+          <span>✓</span> 구매함
         </button>
       </div>
 
-      <div style={{ marginTop: 12 }}>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            width: "100%",
-            padding: "12px 18px",
-            fontSize: 15,
-            backgroundColor: "transparent",
-            color: "#2563eb",
-            border: "1px solid #2563eb",
-            borderRadius: 14,
-            cursor: "pointer",
-          }}
-        >
-          새로 비교하기
-        </button>
+      <div
+        style={{
+          marginTop: 16,
+          padding: 16,
+          fontSize: 11,
+          color: "var(--muted)",
+          textAlign: "center",
+          lineHeight: 1.6,
+        }}
+      >
+        <p style={{ margin: 0, marginBottom: 4 }}>
+          ⓘ 해당 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다
+        </p>
+        <p style={{ margin: 0 }}>
+          ※ 가격 및 환율은 실시간 변동 가능하며, 동일 모델/옵션 기준으로 비교되었습니다
+        </p>
       </div>
     </div>
   );
