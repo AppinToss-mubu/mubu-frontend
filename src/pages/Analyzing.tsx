@@ -66,7 +66,12 @@ function Analyzing() {
         clearInterval(interval);
         console.error("분석 실패:", err);
         const errorMessage = err?.message || "";
-        if (errorMessage.includes("429") || errorMessage.includes("Too Many") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
+        if (
+          errorMessage.includes("429") || 
+          errorMessage.includes("Too Many") || 
+          errorMessage.includes("RESOURCE_EXHAUSTED") ||
+          errorMessage.includes("서버 오류")
+        ) {
           setIsRateLimited(true);
         }
         setLocalError(err as Error);
