@@ -33,12 +33,21 @@ export const compareWithImageAPI = async (
   formData.append("file", file);
   formData.append("imageId", clientImageId);
 
+  console.log("[API] 요청 시작:", `${API_BASE_URL}/api/price/compare-with-image`);
+  
   const response = await fetch(`${API_BASE_URL}/api/price/compare-with-image`, {
     method: "POST",
     body: formData,
   });
 
-  const json = await response.json().catch(() => ({}));
+  console.log("[API] 응답 상태:", response.status, response.ok);
+
+  const json = await response.json().catch((e) => {
+    console.error("[API] JSON 파싱 실패:", e);
+    return {};
+  });
+  
+  console.log("[API] 응답 데이터:", json);
   
   // 400 에러지만 상품 정보가 있으면 (한국 가격만 못 찾은 경우) 결과 반환
   if (!response.ok) {
