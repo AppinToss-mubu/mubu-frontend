@@ -160,7 +160,7 @@ function Analyzing() {
               <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 28, lineHeight: 1.8 }}>
                 {isRateLimited ? (
                   <>
-                    요청이 많아 잠시 후 다시 시도해주세요<br />
+                    무료버전은 요청이 많으면 쉬어가야해요 ㅠㅠ<br />
                     30초 정도 기다려주세요
                   </>
                 ) : (

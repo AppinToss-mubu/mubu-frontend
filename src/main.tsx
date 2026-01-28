@@ -1,8 +1,9 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TDSMobileAITProvider } from "@toss/tds-mobile-ait";
+import "./index.css";
+import App from "./App.tsx";
 
 // React Query 클라이언트 생성
 const queryClient = new QueryClient({
@@ -12,12 +13,14 @@ const queryClient = new QueryClient({
       retry: 1, // 실패 시 1번만 재시도
     },
   },
-})
+});
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <TDSMobileAITProvider>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </TDSMobileAITProvider>
   </StrictMode>,
-)
+);
