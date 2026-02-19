@@ -101,31 +101,43 @@ function PriceConfirm() {
   const hasAiPrice =
     compareResult.localPrice != null && compareResult.localCurrency;
 
+  const isToss = isTossEnvironment();
+
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "var(--bg)" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: isToss ? "#FFFFFF" : "var(--bg)" }}>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "16px 20px",
-          borderBottom: "1px solid var(--border)",
+          borderBottom: isToss ? "1px solid #F2F4F6" : "1px solid var(--border)",
         }}
       >
-        <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>가격 확인</h1>
+        <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0, color: isToss ? "#191F28" : undefined }}>가격 확인</h1>
         <button
           onClick={handleClose}
           style={{
             background: "transparent",
             border: "none",
-            fontSize: 24,
+            fontSize: isToss ? 20 : 24,
             cursor: "pointer",
-            color: "var(--muted)",
+            color: isToss ? "#8B95A1" : "var(--muted)",
             padding: 4,
+            width: isToss ? 32 : undefined,
+            height: isToss ? 32 : undefined,
+            display: isToss ? "flex" : undefined,
+            alignItems: isToss ? "center" : undefined,
+            justifyContent: isToss ? "center" : undefined,
           }}
           aria-label="닫기"
         >
-          ×
+          {isToss ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : "×"}
         </button>
       </div>
 
@@ -136,7 +148,7 @@ function PriceConfirm() {
               marginTop: 20,
               borderRadius: 16,
               overflow: "hidden",
-              border: "1px solid var(--border)",
+              border: isToss ? "none" : "1px solid var(--border)",
             }}
           >
             <img
@@ -158,8 +170,8 @@ function PriceConfirm() {
               fontWeight: 700,
               margin: 0,
               marginBottom: 4,
-              color: "var(--fg)",
-              lineHeight: 1.4,
+              color: isToss ? "#191F28" : "var(--fg)",
+              lineHeight: "25.2px",
             }}
           >
             {compareResult.productName || "상품명 인식 실패"}
@@ -168,10 +180,10 @@ function PriceConfirm() {
             <p
               style={{
                 fontSize: 12,
-                color: "var(--muted)",
+                color: isToss ? "#B0B8C1" : "var(--muted)",
                 margin: 0,
                 marginTop: 2,
-                opacity: 0.6,
+                opacity: isToss ? 1 : 0.6,
               }}
             >
               {compareResult.mallName}
@@ -185,14 +197,14 @@ function PriceConfirm() {
               marginTop: 24,
               padding: 20,
               borderRadius: 16,
-              backgroundColor: "var(--card)",
-              border: "1px solid var(--border)",
+              backgroundColor: isToss ? "#F9FAFB" : "var(--card)",
+              border: isToss ? "none" : "1px solid var(--border)",
             }}
           >
             <div
               style={{
                 fontSize: 13,
-                color: "var(--muted)",
+                color: isToss ? "#8B95A1" : "var(--muted)",
                 marginBottom: 8,
               }}
             >
@@ -202,7 +214,7 @@ function PriceConfirm() {
               style={{
                 fontSize: 36,
                 fontWeight: 800,
-                color: "var(--fg)",
+                color: isToss ? "#191F28" : "var(--fg)",
               }}
             >
               {currencySymbol}
@@ -211,7 +223,7 @@ function PriceConfirm() {
             <div
               style={{
                 fontSize: 13,
-                color: "var(--muted)",
+                color: isToss ? "#B0B8C1" : "var(--muted)",
                 marginTop: 4,
               }}
             >
@@ -224,7 +236,7 @@ function PriceConfirm() {
                 marginTop: 24,
                 marginBottom: 16,
                 fontSize: 14,
-                color: "var(--muted)",
+                color: isToss ? "#8B95A1" : "var(--muted)",
               }}
             >
               이 가격이 맞나요?
@@ -308,14 +320,14 @@ function PriceConfirm() {
               marginTop: 24,
               padding: 20,
               borderRadius: 16,
-              backgroundColor: "var(--card)",
-              border: "1px solid var(--border)",
+              backgroundColor: isToss ? "#F9FAFB" : "var(--card)",
+              border: isToss ? "none" : "1px solid var(--border)",
             }}
           >
             <div
               style={{
                 fontSize: 13,
-                color: "var(--muted)",
+                color: isToss ? "#8B95A1" : "var(--muted)",
                 marginBottom: 16,
               }}
             >
@@ -327,7 +339,7 @@ function PriceConfirm() {
                 style={{
                   display: "block",
                   fontSize: 13,
-                  color: "var(--muted)",
+                  color: isToss ? "#8B95A1" : "var(--muted)",
                   marginBottom: 8,
                 }}
               >
@@ -340,10 +352,10 @@ function PriceConfirm() {
                   width: "100%",
                   padding: "12px 16px",
                   borderRadius: 12,
-                  border: "1px solid var(--border)",
-                  backgroundColor: "var(--bg)",
+                  border: isToss ? "1px solid #E5E8EB" : "1px solid var(--border)",
+                  backgroundColor: isToss ? "#FFFFFF" : "var(--bg)",
                   fontSize: 16,
-                  color: "var(--fg)",
+                  color: isToss ? "#191F28" : "var(--fg)",
                 }}
               >
                 <option value="THB">THB (฿) - 태국 바트</option>

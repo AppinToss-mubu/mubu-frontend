@@ -39,10 +39,11 @@ export function ImageSourceSheet({
     >
       <div
         style={{
-          width: 64,
-          height: 64,
-          borderRadius: "50%",
-          border: "3px solid var(--border)",
+          width: 56,
+          height: 56,
+          borderRadius: 16,
+          backgroundColor: isToss ? "#E8F3FF" : undefined,
+          border: isToss ? "none" : "3px solid var(--border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -50,12 +51,12 @@ export function ImageSourceSheet({
         }}
       >
         <svg
-          width="28"
-          height="28"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+          stroke={isToss ? "#3182F6" : "currentColor"}
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -66,9 +67,9 @@ export function ImageSourceSheet({
       <div
         style={{
           fontSize: 14,
-          color: "var(--muted)",
+          color: isToss ? "#8B95A1" : "var(--muted)",
           textAlign: "center",
-          lineHeight: 1.5,
+          lineHeight: "21px",
         }}
       >
         가격표가 보이도록 상품을 촬영하거나

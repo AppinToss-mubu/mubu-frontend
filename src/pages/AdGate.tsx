@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
-import { TDSButton } from "../components/tds";
+import { TDSButton, TDSLoader } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
 
 type AdState = "prompt" | "loading" | "showing" | "done" | "failed";
 
-function AdFailedView({ imageId, navigate }: { imageId: string; navigate: (path: string, opts?: any) => void }) {
+function AdFailedView({ imageId, navigate, errorMsg }: { imageId: string; navigate: (path: string, opts?: any) => void; errorMsg?: string }) {
   const [countdown, setCountdown] = useState(3);
   const navigatedRef = useRef(false);
 
@@ -23,28 +23,33 @@ function AdFailedView({ imageId, navigate }: { imageId: string; navigate: (path:
   }, [imageId, navigate]);
 
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center", padding: "0 24px" }}>
       <div style={{
-        width: 72,
-        height: 72,
-        borderRadius: 20,
-        backgroundColor: "#FFF0F0",
+        width: 56,
+        height: 56,
+        borderRadius: 16,
+        backgroundColor: "#FFEEEE",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         margin: "0 auto 20px",
       }}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="10" stroke="#F04452" strokeWidth="2"/>
           <path d="M12 8v4M12 16h.01" stroke="#F04452" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       </div>
-      <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", marginBottom: 6 }}>
+      <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", lineHeight: "25.5px", marginBottom: 6 }}>
         광고를 불러오지 못했어요
       </div>
-      <div style={{ fontSize: 14, color: "#8B95A1", marginBottom: 24 }}>
+      <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: "21px", marginBottom: 8 }}>
         {countdown}초 후 결과 페이지로 이동해요
       </div>
+      {errorMsg && (
+        <div style={{ fontSize: 12, color: "#B0B8C1", lineHeight: "18px", marginBottom: 20, wordBreak: "break-all" }}>
+          {errorMsg}
+        </div>
+      )}
       <TDSButton
         onClick={() => {
           if (!navigatedRef.current) {
@@ -63,7 +68,6 @@ function AdFailedView({ imageId, navigate }: { imageId: string; navigate: (path:
   );
 }
 
-// 테스트용 광고 그룹 ID (실서비스 시 콘솔에서 발급받은 ID로 교체)
 const TEST_AD_GROUP_ID = "ait-ad-test-interstitial-id";
 
 function AdGate() {
@@ -71,6 +75,7 @@ function AdGate() {
   const navigate = useNavigate();
   const { compareResult } = usePriceStore();
   const [adState, setAdState] = useState<AdState>("prompt");
+  const [adError, setAdError] = useState<string>("");
 
   useEffect(() => {
     if (!imageId || !compareResult) {
@@ -80,10 +85,10 @@ function AdGate() {
   }, [imageId, compareResult, navigate]);
 
   useEffect(() => {
-    if (!isTossEnvironment()) {
+    if (!isTossEnvironment() && imageId) {
       navigate(`/price-confirm/${imageId}`, { replace: true });
     }
-  }, []);
+  }, [imageId]);
 
   const handleWatchAd = async () => {
     if (!isTossEnvironment()) {
@@ -92,11 +97,18 @@ function AdGate() {
     }
 
     setAdState("loading");
+    setAdError("");
 
     try {
       const { GoogleAdMob } = await import("@apps-in-toss/web-framework");
 
-      // 광고 표시 함수 (먼저 정의)
+      try {
+        const loaded = await GoogleAdMob.isAppsInTossAdMobLoaded({ adGroupId: TEST_AD_GROUP_ID });
+        console.log("[AdGate] isAppsInTossAdMobLoaded:", loaded);
+      } catch (checkErr) {
+        console.log("[AdGate] isAppsInTossAdMobLoaded check failed (proceeding anyway):", checkErr);
+      }
+
       const showAd = () => {
         setAdState("showing");
 
@@ -104,64 +116,65 @@ function AdGate() {
           options: {
             adGroupId: TEST_AD_GROUP_ID,
           },
-          onEvent: (event) => {
+          onEvent: (event: any) => {
+            console.log("[AdGate] show event:", event.type);
             switch (event.type) {
               case "show":
-                console.log("광고 표시됨");
                 break;
               case "impression":
-                console.log("광고 노출 (수익 카운트)");
                 break;
               case "clicked":
-                console.log("광고 클릭됨");
                 break;
               case "dismissed":
-                console.log("광고 닫힘");
                 setAdState("done");
                 navigate(`/price-confirm/${imageId}`, { replace: true });
                 break;
               case "failedToShow":
-                console.error("광고 표시 실패");
+                console.error("[AdGate] failedToShow:", JSON.stringify(event));
+                setAdError("광고 표시 실패: " + (event.data?.message || event.type));
                 setAdState("failed");
                 break;
             }
           },
-          onError: (error) => {
-            console.error("광고 보여주기 실패:", error);
+          onError: (error: any) => {
+            console.error("[AdGate] show onError:", JSON.stringify(error));
+            setAdError("show 에러: " + (error?.message || String(error)));
             setAdState("failed");
           },
         });
       };
 
-      // 광고 로드
       const loadCleanup = GoogleAdMob.loadAppsInTossAdMob({
         options: {
           adGroupId: TEST_AD_GROUP_ID,
         },
-        onEvent: (event) => {
+        onEvent: (event: any) => {
+          console.log("[AdGate] load event:", event.type, JSON.stringify(event.data || {}));
           switch (event.type) {
             case "loaded":
-              console.log("광고 로드 성공");
+              console.log("[AdGate] 광고 로드 성공");
               loadCleanup();
-              // 로드 완료 후 즉시 표시
               showAd();
               break;
           }
         },
-        onError: (error) => {
-          console.error("광고 불러오기 실패:", error);
+        onError: (error: any) => {
+          console.error("[AdGate] load onError:", JSON.stringify(error));
+          const msg = error?.message || error?.code || String(error);
+          setAdError("load 에러: " + msg);
           loadCleanup();
           setAdState("failed");
         },
       });
-    } catch (error) {
-      console.error("광고 SDK 로드 실패:", error);
+    } catch (error: any) {
+      console.error("[AdGate] SDK import 실패:", error);
+      setAdError("SDK 로드 실패: " + (error?.message || String(error)));
       setAdState("failed");
     }
   };
 
-  const handleClose = () => {
-    navigate("/");
+  const handleSkip = () => {
+    navigate(`/price-confirm/${imageId}`, { replace: true });
   };
 
   if (!compareResult || !imageId) {
@@ -184,17 +197,17 @@ function AdGate() {
         {adState === "prompt" && (
           <>
             <div style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              background: "linear-gradient(135deg, #E8F3FF 0%, #D4E8FF 100%)",
+              width: 56,
+              height: 56,
+              borderRadius: 16,
+              backgroundColor: "#E8F3FF",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              marginBottom: 28,
+              marginBottom: 24,
             }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4" stroke="#3182F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4" stroke="#3182F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="12" cy="12" r="10" stroke="#3182F6" strokeWidth="2" fill="none"/>
               </svg>
             </div>
@@ -204,85 +217,83 @@ function AdGate() {
               fontWeight: 700,
               color: "#191F28",
               textAlign: "center",
-              lineHeight: 1.4,
-              marginBottom: 12,
+              lineHeight: "31px",
+              marginBottom: 8,
             }}>
               분석이 완료되었어요!
             </div>
 
             <div style={{
               fontSize: 15,
+              fontWeight: 500,
               color: "#8B95A1",
               textAlign: "center",
-              lineHeight: 1.7,
-              marginBottom: 40,
+              lineHeight: "22.5px",
+              marginBottom: 32,
             }}>
-              짧은 광고를 시청하면
-              <br />
-              가격 비교 결과를 확인할 수 있어요
+              짧은 광고를 시청하면{"\n"}가격 비교 결과를 확인할 수 있어요
             </div>
 
             <div style={{
               width: "100%",
-              maxWidth: 320,
               display: "flex",
               flexDirection: "column",
-              gap: 10,
+              gap: 8,
             }}>
               <div style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
-                padding: "14px 16px",
-                borderRadius: 14,
-                backgroundColor: "#F8F9FA",
+                gap: 16,
+                padding: "16px 20px",
+                borderRadius: 16,
+                backgroundColor: "#F9FAFB",
               }}>
                 <div style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
                   backgroundColor: "#E8F3FF",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
                 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="3" width="20" height="14" rx="2" stroke="#3182F6" strokeWidth="2"/>
-                    <path d="M8 21h8M12 17v4" stroke="#3182F6" strokeWidth="2" strokeLinecap="round"/>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="3" width="20" height="14" rx="2" stroke="#3182F6" strokeWidth="1.5"/>
+                    <path d="M8 21h8M12 17v4" stroke="#3182F6" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#333D4B" }}>광고 시청</div>
-                  <div style={{ fontSize: 12, color: "#8B95A1", marginTop: 2 }}>약 15~30초 소요</div>
+                  <div style={{ fontSize: 16, fontWeight: 500, color: "#191F28", lineHeight: "24px" }}>광고 시청</div>
+                  <div style={{ fontSize: 14, color: "#8B95A1", marginTop: 2, lineHeight: "21px" }}>약 15~30초 소요</div>
                 </div>
               </div>
 
               <div style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
-                padding: "14px 16px",
-                borderRadius: 14,
-                backgroundColor: "#F8F9FA",
+                gap: 16,
+                padding: "16px 20px",
+                borderRadius: 16,
+                backgroundColor: "#F9FAFB",
               }}>
                 <div style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  backgroundColor: "#E5F9ED",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  backgroundColor: "#F0FAF6",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
                 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="#1DB866" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="#03B26C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#333D4B" }}>결과 확인</div>
-                  <div style={{ fontSize: 12, color: "#8B95A1", marginTop: 2 }}>한국 최저가와 비교해볼 수 있어요</div>
+                  <div style={{ fontSize: 16, fontWeight: 500, color: "#191F28", lineHeight: "24px" }}>결과 확인</div>
+                  <div style={{ fontSize: 14, color: "#8B95A1", marginTop: 2, lineHeight: "21px" }}>한국 최저가와 비교해볼 수 있어요</div>
                 </div>
               </div>
             </div>
@@ -290,61 +301,25 @@ function AdGate() {
         )}
 
         {adState === "loading" && (
-          <div style={{ textAlign: "center" }}>
-            <div style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              border: "3px solid #E5E8EB",
-              borderTopColor: "#3182F6",
-              animation: "ad-gate-spin 1s linear infinite",
-              margin: "0 auto 20px",
-            }} />
-            <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", marginBottom: 6 }}>
-              광고를 불러오는 중이에요
-            </div>
-            <div style={{ fontSize: 14, color: "#8B95A1" }}>
-              잠시만 기다려주세요
-            </div>
-          </div>
+          <TDSLoader size="large" type="primary" label={"광고를 불러오는 중이에요\n잠시만 기다려주세요"} />
         )}
 
         {adState === "showing" && (
-          <div style={{ textAlign: "center" }}>
-            <div style={{
-              width: 72,
-              height: 72,
-              borderRadius: 20,
-              background: "linear-gradient(135deg, #E8F3FF 0%, #D4E8FF 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 20px",
-            }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="#3182F6">
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-            </div>
-            <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", marginBottom: 6 }}>
-              광고 재생 중...
-            </div>
-            <div style={{ fontSize: 14, color: "#8B95A1" }}>
-              곧 결과를 확인하실 수 있어요
-            </div>
-          </div>
+          <TDSLoader size="large" type="primary" label={"광고 재생 중...\n곧 결과를 확인하실 수 있어요"} />
         )}
 
         {adState === "failed" && (
-          <AdFailedView imageId={imageId!} navigate={navigate} />
+          <AdFailedView imageId={imageId!} navigate={navigate} errorMsg={adError} />
         )}
       </div>
 
       {adState === "prompt" && (
         <div style={{
-          padding: "0 24px 40px",
+          padding: "0 24px",
+          paddingBottom: "max(24px, env(safe-area-inset-bottom))",
           display: "flex",
           flexDirection: "column",
-          gap: 10,
+          gap: 8,
         }}>
           <TDSButton
             onClick={handleWatchAd}
@@ -356,7 +331,7 @@ function AdGate() {
             광고 시청 후 결과 보기
           </TDSButton>
           <button
-            onClick={handleClose}
+            onClick={handleSkip}
             style={{
               background: "none",
               border: "none",
@@ -366,18 +341,13 @@ function AdGate() {
               color: "#8B95A1",
               cursor: "pointer",
               textAlign: "center",
+              lineHeight: "22.5px",
             }}
           >
             다음에 할게요
           </button>
         </div>
       )}
-
-      <style>{`
-        @keyframes ad-gate-spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

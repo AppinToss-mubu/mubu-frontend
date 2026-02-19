@@ -111,14 +111,16 @@ function Result() {
     }
   };
 
+  const isToss = isTossEnvironment();
+
   return (
     <div style={{ paddingBottom: 100 }}>
       <div
         style={{
           padding: 20,
           borderRadius: 16,
-          backgroundColor: "var(--card)",
-          border: "1px solid var(--border)",
+          backgroundColor: isToss ? "#F9FAFB" : "var(--card)",
+          border: isToss ? "none" : "1px solid var(--border)",
         }}
       >
         <h2
@@ -127,7 +129,7 @@ function Result() {
             fontWeight: 700,
             margin: 0,
             marginBottom: 4,
-            color: "var(--fg)",
+            color: isToss ? "#191F28" : "var(--fg)",
           }}
         >
           {compareResult.productName}
@@ -135,7 +137,7 @@ function Result() {
         <p
           style={{
             fontSize: 13,
-            color: "var(--muted)",
+            color: isToss ? "#8B95A1" : "var(--muted)",
             margin: 0,
           }}
         >
@@ -152,7 +154,7 @@ function Result() {
             marginBottom: 20,
           }}
         >
-          <span style={{ fontSize: 14, color: "var(--muted)" }}>수량</span>
+          <span style={{ fontSize: 14, color: isToss ? "#8B95A1" : "var(--muted)" }}>수량</span>
           {isTossEnvironment() ? (
             <TDSNumericSpinner
               value={quantity}
@@ -237,16 +239,16 @@ function Result() {
             style={{
               padding: 16,
               borderRadius: 12,
-              backgroundColor: "var(--bg)",
+              backgroundColor: isToss ? "#FFFFFF" : "var(--bg)",
               textAlign: "center",
             }}
           >
             <div
-              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+              style={{ fontSize: 12, color: isToss ? "#8B95A1" : "var(--muted)", marginBottom: 6 }}
             >
               현지 단가
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: isToss ? "#191F28" : undefined }}>
               {localUnitPrice.toLocaleString()}
               {currencySymbol}
             </div>
@@ -255,16 +257,16 @@ function Result() {
             style={{
               padding: 16,
               borderRadius: 12,
-              backgroundColor: "var(--bg)",
+              backgroundColor: isToss ? "#FFFFFF" : "var(--bg)",
               textAlign: "center",
             }}
           >
             <div
-              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+              style={{ fontSize: 12, color: isToss ? "#8B95A1" : "var(--muted)", marginBottom: 6 }}
             >
               한국 단가
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: isToss ? "#191F28" : undefined }}>
               {hasKoreaPrice ? `₩${formatCurrency(koreaUnitPrice)}` : "₩0"}
             </div>
           </div>
@@ -281,20 +283,20 @@ function Result() {
             style={{
               padding: 16,
               borderRadius: 12,
-              backgroundColor: "var(--bg)",
+              backgroundColor: isToss ? "#FFFFFF" : "var(--bg)",
               textAlign: "center",
             }}
           >
             <div
-              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+              style={{ fontSize: 12, color: isToss ? "#8B95A1" : "var(--muted)", marginBottom: 6 }}
             >
               현지 총액
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: isToss ? "#191F28" : undefined }}>
               {localTotal.toLocaleString()}
               {currencySymbol}
             </div>
-            <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: isToss ? "#B0B8C1" : "var(--muted)", marginTop: 4 }}>
               ₩{formatCurrency(localTotalKrw)}
             </div>
           </div>
@@ -302,16 +304,16 @@ function Result() {
             style={{
               padding: 16,
               borderRadius: 12,
-              backgroundColor: "var(--bg)",
+              backgroundColor: isToss ? "#FFFFFF" : "var(--bg)",
               textAlign: "center",
             }}
           >
             <div
-              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}
+              style={{ fontSize: 12, color: isToss ? "#8B95A1" : "var(--muted)", marginBottom: 6 }}
             >
               한국 총액
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: isToss ? "#191F28" : undefined }}>
               {hasKoreaPrice ? `₩${formatCurrency(koreaTotal)}` : "₩0"}
             </div>
           </div>
@@ -324,9 +326,10 @@ function Result() {
             marginTop: 16,
             padding: 16,
             borderRadius: 12,
-            backgroundColor: "#fee2e2",
-            color: "#b91c1c",
+            backgroundColor: isToss ? "#FFEEEE" : "#fee2e2",
+            color: isToss ? "#F04452" : "#b91c1c",
             textAlign: "center",
+            fontSize: 14,
           }}
         >
           {summaryError.message || "가격 비교에 실패했습니다."}
@@ -339,8 +342,10 @@ function Result() {
             marginTop: 16,
             padding: 24,
             borderRadius: 16,
-            backgroundColor: "var(--card)",
+            backgroundColor: isToss ? "#F9FAFB" : "var(--card)",
             textAlign: "center",
+            color: isToss ? "#8B95A1" : undefined,
+            fontSize: 14,
           }}
         >
           계산 중...
@@ -351,26 +356,37 @@ function Result() {
             marginTop: 16,
             padding: 24,
             borderRadius: 16,
-            background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+            background: isToss ? "#FFF8E1" : "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 36, marginBottom: 8 }}>🔍</div>
+          <div style={{
+            width: 48,
+            height: 48,
+            borderRadius: 14,
+            backgroundColor: isToss ? "#FFF0C2" : undefined,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 12px",
+            fontSize: 24,
+          }}>🔍</div>
           <div
             style={{
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: 700,
-              color: "#92400e",
+              color: isToss ? "#191F28" : "#92400e",
               marginBottom: 8,
+              lineHeight: "25.5px",
             }}
           >
             한국에서 구할 수 없을 수도 있어요
           </div>
           <div
             style={{
-              fontSize: 13,
-              color: "#a16207",
-              lineHeight: 1.6,
+              fontSize: 14,
+              color: isToss ? "#8B95A1" : "#a16207",
+              lineHeight: "21px",
             }}
           >
             이 상품은 한국에서 판매되지 않거나
@@ -381,13 +397,14 @@ function Result() {
             style={{
               marginTop: 16,
               padding: 12,
-              borderRadius: 8,
-              backgroundColor: "rgba(255,255,255,0.6)",
-              fontSize: 13,
-              color: "#78350f",
+              borderRadius: 12,
+              backgroundColor: isToss ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.6)",
+              fontSize: 14,
+              color: isToss ? "#191F28" : "#78350f",
+              lineHeight: "21px",
             }}
           >
-            💡 현지에서 구매하시는 걸 추천해요!
+            현지에서 구매하시는 걸 추천해요!
             <br />
             현지가:{" "}
             <strong>
@@ -403,19 +420,20 @@ function Result() {
             marginTop: 16,
             padding: 24,
             borderRadius: 16,
-            background:
-              savedTotal > 0
+            background: isToss
+              ? (savedTotal > 0 ? "#E8F3FF" : savedTotal < 0 ? "#F0FAF6" : "#F9FAFB")
+              : (savedTotal > 0
                 ? "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)"
                 : savedTotal < 0
                   ? "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)"
-                  : "var(--card)",
+                  : "var(--card)"),
             textAlign: "center",
           }}
         >
           <div
             style={{
               fontSize: 14,
-              color: "var(--muted)",
+              color: isToss ? "#8B95A1" : "var(--muted)",
               marginBottom: 4,
             }}
           >
@@ -425,12 +443,13 @@ function Result() {
             style={{
               fontSize: 28,
               fontWeight: 800,
-              color:
-                savedTotal > 0
+              color: isToss
+                ? (savedTotal > 0 ? "#3182F6" : savedTotal < 0 ? "#03B26C" : "#191F28")
+                : (savedTotal > 0
                   ? "#0369a1"
                   : savedTotal < 0
                     ? "#15803d"
-                    : "var(--fg)",
+                    : "var(--fg)"),
             }}
           >
             {`${Math.abs(savedTotal).toLocaleString()}원`}
@@ -438,7 +457,7 @@ function Result() {
           <div
             style={{
               fontSize: 13,
-              color: "var(--muted)",
+              color: isToss ? "#8B95A1" : "var(--muted)",
               marginTop: 8,
             }}
           >
@@ -572,7 +591,7 @@ function Result() {
           marginTop: 16,
           padding: 16,
           fontSize: 11,
-          color: "var(--muted)",
+          color: isToss ? "#B0B8C1" : "var(--muted)",
           textAlign: "center",
           lineHeight: 1.6,
         }}

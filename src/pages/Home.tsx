@@ -106,14 +106,14 @@ function Home() {
   return (
     <div>
       <div style={{ marginTop: 18 }}>
-        <div style={{ fontSize: 18, color: "var(--muted)" }}>안녕하세요</div>
-        <div style={{ fontSize: 34, fontWeight: 800, marginTop: 6 }}>
+        <div style={{ fontSize: 18, color: isTossEnvironment() ? "#8B95A1" : "var(--muted)" }}>안녕하세요</div>
+        <div style={{ fontSize: 34, fontWeight: 800, marginTop: 6, color: isTossEnvironment() ? "#191F28" : undefined }}>
           여행자님
         </div>
         <div
           style={{
             fontSize: 16,
-            color: "var(--muted)",
+            color: isTossEnvironment() ? "#8B95A1" : "var(--muted)",
             marginTop: 10,
             lineHeight: 1.6,
           }}
@@ -212,9 +212,11 @@ function Home() {
             marginTop: 16,
             padding: 12,
             borderRadius: 12,
-            backgroundColor: "#fee2e2",
-            color: "#b91c1c",
-            border: "1px solid #fecaca",
+            backgroundColor: isTossEnvironment() ? "#FFEEEE" : "#fee2e2",
+            color: isTossEnvironment() ? "#F04452" : "#b91c1c",
+            border: isTossEnvironment() ? "none" : "1px solid #fecaca",
+            fontSize: 14,
+            lineHeight: "21px",
           }}
         >
           {localError}
@@ -229,15 +231,16 @@ function Home() {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ fontSize: 18, fontWeight: 800 }}>최근 비교</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: isTossEnvironment() ? "#191F28" : undefined }}>최근 비교</div>
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
             style={{
               border: "none",
               background: "transparent",
-              color: "var(--muted)",
-              fontWeight: 700,
+              color: isTossEnvironment() ? "#3182F6" : "var(--muted)",
+              fontWeight: 600,
+              fontSize: 14,
               cursor: "pointer",
             }}
           >
@@ -247,7 +250,7 @@ function Home() {
 
         <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
           {recent.length === 0 ? (
-            <div style={{ color: "var(--muted)", padding: "8px 2px" }}>
+            <div style={{ color: isTossEnvironment() ? "#8B95A1" : "var(--muted)", padding: "8px 2px", fontSize: 14, lineHeight: "21px" }}>
               아직 비교한 기록이 없어요.
             </div>
           ) : (

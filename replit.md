@@ -143,3 +143,14 @@ npm run dev
   - AdGate에서만 load → show 순차 호출하도록 변경
   - AdGate 광고 실패 시 3초 카운트다운 후 자동 결과 페이지 이동 추가
   - cursor-handoff.md에 디버깅 팁 섹션 추가
+
+- 2026-02-19: 광고 SDK / 권한 / TDS 디자인 일괄 개선
+  - **AdGate.tsx**: `isAppsInTossAdMobLoaded()` 사전 체크, JSON.stringify 에러 로그, 에러 메시지 UI 표시, TDSLoader 사용, TDS 토큰 전면 적용
+  - **useToss.ts**: `getPermission()` → `openPermissionDialog()` 권한 플로우 추가 (카메라 + 앨범 모두), `notDetermined` 상태에서도 권한 대화상자 표시
+  - **TDS 디자인 일관성 강화** (모든 페이지):
+    - Home: 제목/본문 TDS 색상 토큰, 에러 메시지 red500, 전체보기 링크 blue500
+    - ImageSourceSheet: 아이콘 컨테이너 TDS 스타일 (E8F3FF bg, blue500 stroke)
+    - PriceConfirm: 흰색 배경, F9FAFB 카드, E5E8EB 셀렉트 보더, SVG 닫기 버튼
+    - Result: 가격 그리드 흰색 bg, 절약 섹션 TDS 색상 (blue500/green500), 에러 red500
+    - Analyzing: 기존 TDS 스타일 유지
+  - TDS 색상 토큰 정리: grey900(#191F28), grey500(#8B95A1), grey400(#B0B8C1), blue500(#3182F6), red500(#F04452), green500(#03B26C)
