@@ -23,7 +23,6 @@ function AdGate() {
 
   useEffect(() => {
     if (!isTossEnvironment()) {
-      incrementCompareCount();
       navigate(`/price-confirm/${imageId}`, { replace: true });
     }
   }, []);
