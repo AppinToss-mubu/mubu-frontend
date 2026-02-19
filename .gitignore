@@ -60,3 +60,6 @@ attached_assets/
 *.zip
 
 .granite
+
+# Toss App Bundle files
+*.ait
