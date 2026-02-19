@@ -172,14 +172,11 @@ function PriceConfirm() {
               />
             </List>
 
-            {/* @ts-expect-error TDS FixedBottomCTA/CTAButton API */}
             <FixedBottomCTA.Double
               leftButton={
-                // @ts-expect-error TDS CTAButton props
                 <CTAButton color="dark" variant="weak" display="block" onClick={handleEdit} label="수정" />
               }
               rightButton={
-                // @ts-expect-error TDS CTAButton props
                 <CTAButton display="block" onClick={handleConfirm} label="맞아요" />
               }
             />
@@ -189,7 +186,6 @@ function PriceConfirm() {
         {(editMode || !hasAiPrice) && (
           <>
             <div style={{ padding: "0 20px" }}>
-              {/* @ts-expect-error TDS ListHeader props vary by version */}
               <ListHeader
                 title={
                   <Menu.Trigger
@@ -216,7 +212,6 @@ function PriceConfirm() {
                       </Menu.Dropdown>
                     }
                   >
-                    {/* @ts-expect-error TDS TitleSelector props */}
                   <ListHeader.TitleSelector color={adaptive.grey800} typography="t5">
                       {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
                     </ListHeader.TitleSelector>
@@ -248,19 +243,15 @@ function PriceConfirm() {
               </div>
             </div>
 
-            {/* @ts-expect-error TDS FixedBottomCTA/CTAButton API */}
             <FixedBottomCTA.Double
               leftButton={
                 editMode ? (
-                  // @ts-expect-error TDS CTAButton props
                   <CTAButton color="dark" variant="weak" display="block" onClick={() => setEditMode(false)} label="취소" />
                 ) : (
-                  // @ts-expect-error TDS CTAButton props
                   <CTAButton color="dark" variant="weak" display="block" onClick={handleClose} label="취소" />
                 )
               }
               rightButton={
-                // @ts-expect-error TDS CTAButton props
                 <CTAButton display="block" onClick={handleEditSubmit} label="확인" />
               }
             />

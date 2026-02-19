@@ -135,7 +135,6 @@ function Result() {
         />
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 20px" }}>
-          {/* @ts-expect-error TDS NumericSpinner onChange type */}
           <NumericSpinner number={quantity} minNumber={1} maxNumber={999} onChange={(n: number) => setQuantity(n)} size="large" />
         </div>
 

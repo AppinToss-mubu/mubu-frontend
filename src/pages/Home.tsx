@@ -190,17 +190,14 @@ function Home() {
         ) : (
           <>
             {recent.slice(0, 3).map((r) => (
-              // @ts-expect-error TDS ListHeader props vary by version
               <ListHeader
                 key={r.id}
                 title={
-                  // @ts-expect-error TDS ListHeader.TitleParagraph props
                   <ListHeader.TitleParagraph color={adaptive.grey800} typography="t5" fontWeight="semibold">
                     {r.productName}
                   </ListHeader.TitleParagraph>
                 }
                 right={
-                  // @ts-expect-error TDS ListHeader.RightArrow props
                   <ListHeader.RightArrow color={adaptive.grey400} typography="t7">
                     {r.savedAmount >= 0 ? "+" : "-"}
                     {new Intl.NumberFormat("ko-KR").format(Math.abs(r.savedAmount))}원

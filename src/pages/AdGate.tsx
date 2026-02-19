@@ -179,10 +179,6 @@ function AdGate() {
     }
   };
 
-  const _handleSkip = () => {
-    navigate(`/price-confirm/${imageId}`, { replace: true });
-  };
-
   if (!compareResult || !imageId) {
     return null;
   }
@@ -199,7 +195,7 @@ function AdGate() {
     );
   }
 
-  const { Asset, Text, FixedBottomCTA, Button, Loader } = tds;
+  const { Asset, Text, FixedBottomCTA, Loader } = tds;
   const { adaptive } = colors;
 
   return (
@@ -256,7 +252,6 @@ function AdGate() {
       </div>
 
       {adState === "prompt" && (
-        // @ts-expect-error TDS FixedBottomCTA API varies by version
         <FixedBottomCTA loading={false} onClick={handleWatchAd}>
           광고 시청 후 결과 보기
         </FixedBottomCTA>
