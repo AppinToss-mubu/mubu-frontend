@@ -1,10 +1,5 @@
-/**
- * TDS 스타일 NumericSpinner 래퍼
- * - Toss 환경: TDS NumericSpinner 스타일 적용
- * - 일반 웹: 기존 스타일 유지
- */
-
 import { isTossEnvironment } from "../../utils/env";
+import { useTDS } from "../../utils/tds";
 
 interface TDSNumericSpinnerProps {
   value: number;
@@ -33,12 +28,30 @@ export function TDSNumericSpinner({
   max = 999,
   size = "medium",
   disabled = false,
-  decreaseAriaLabel = "빼기",
-  increaseAriaLabel = "더하기",
+  decreaseAriaLabel = "상품 수량 줄이기",
+  increaseAriaLabel = "상품 수량 늘리기",
   style,
   className,
 }: TDSNumericSpinnerProps) {
   const isToss = isTossEnvironment();
+  const { tds, ready: tdsReady } = useTDS();
+
+  if (isToss && tdsReady && tds?.NumericSpinner) {
+    const { NumericSpinner } = tds;
+    return (
+      <NumericSpinner
+        size={size}
+        number={value}
+        onNumberChange={onChange}
+        minNumber={min}
+        maxNumber={max}
+        disable={disabled}
+        decreaseAriaLabel={decreaseAriaLabel}
+        increaseAriaLabel={increaseAriaLabel}
+      />
+    );
+  }
+
   const sizeConfig = tdsSizes[size];
 
   const handleDecrease = () => {
