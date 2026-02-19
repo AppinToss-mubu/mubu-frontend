@@ -155,13 +155,12 @@ npm run dev
     - Analyzing: 기존 TDS 스타일 유지
   - TDS 색상 토큰 정리: grey900(#191F28), grey500(#8B95A1), grey400(#B0B8C1), blue500(#3182F6), red500(#F04452), green500(#03B26C)
 
-- 2026-02-19: TDS v2 실제 컴포넌트 마이그레이션 (커스텀 래퍼 → @toss/tds-mobile 직접 사용)
-  - **패턴**: `require('@toss/tds-mobile')` + `require('@toss/tds-colors')` 동적 로드, try-catch 폴백
-  - **Home.tsx**: Top (인사 헤더), Button (촬영 CTA), ListHeader (최근 비교 목록), ListFooter (더 보기)
-  - **ImageSourceSheet.tsx**: BottomSheet (이미지 선택 시트), Button (촬영/앨범 CTA)
-  - **Analyzing.tsx**: Top (제목), Loader (로딩 스피너), Button (에러 재시도)
-  - **AdGate.tsx**: Asset.Image (이모지), Text (안내 텍스트), FixedBottomCTA.Single (광고 시청 CTA), Loader
-  - **PriceConfirm.tsx**: Post.H1 (페이지 제목), ListRow + ListRow.Texts (가격 표시), FixedBottomCTA.Double + CTAButton (확인/수정), TextField.Clearable (가격 입력), ListHeader.TitleSelector + Menu (통화 선택)
-  - **Result.tsx**: ListRow (상품 정보), NumericSpinner (수량), Top + Top.LowerCTA (절약 섹션 + 액션 버튼), Asset.Icon (아이콘), Button
-  - **비-Toss 환경**: 기존 원본 스타일 100% 유지 (변경 없음)
+- 2026-02-19: TDS v2 동적 import() 마이그레이션 (require → dynamic import)
+  - **핵심 변경**: `require('@toss/tds-mobile')` → `useTDS()` 훅 기반 동적 `import()` 패턴
+  - **이유**: `@toss/tds-mobile`은 비-Toss 환경에서 import 시 에러 throw → ESM import 불가
+  - **새 유틸리티**: `src/utils/tds.ts` - 중앙집중 TDS 로더 (동적 import + 캐시 + React 훅)
+  - **Vite 설정**: `optimizeDeps.exclude`로 TDS 패키지 사전번들링 방지
+  - **적용 파일**: Home, Analyzing, AdGate, PriceConfirm, Result, ImageSourceSheet
+  - **패턴**: `useTDS()` 훅 → `{ tds, colors, ready }` → `if (isToss && tdsReady)` 가드 → 컴포넌트 구조분해
+  - **비-Toss 환경**: 기존 원본 스타일 100% 유지, 콘솔 에러 없음
   - **기존 TDS 래퍼 컴포넌트** (`src/components/tds/`): AppShell의 TDSBottomNav만 사용 중, 나머지는 레거시

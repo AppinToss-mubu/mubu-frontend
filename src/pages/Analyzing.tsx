@@ -9,25 +9,14 @@ import { useNavigate } from "react-router-dom";
 import { useCompareWithImage } from "../hooks/usePriceCompare";
 import { usePriceStore } from "../store/priceStore";
 import { isTossEnvironment } from "../utils/env";
-
-let Top: any, Button: any, Loader: any;
-let adaptive: any;
-try {
-  const tds = require("@toss/tds-mobile");
-  Top = tds.Top;
-  Button = tds.Button;
-  Loader = tds.Loader;
-  const colors = require("@toss/tds-colors");
-  adaptive = colors.adaptive;
-} catch {
-  // TDS not available
-}
+import { useTDS } from "../utils/tds";
 
 function Analyzing() {
   const navigate = useNavigate();
   const { pendingFile, setImageId, setCompareResult, setPendingFile } =
     usePriceStore();
   const { mutateAsync: compareWithImage } = useCompareWithImage();
+  const { tds, colors, ready: tdsReady } = useTDS();
   const [statusText, setStatusText] = useState("가격표를 찾는 중...");
   const [localError, setLocalError] = useState<Error | null>(null);
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -118,7 +107,9 @@ function Analyzing() {
 
   const isToss = isTossEnvironment();
 
-  if (isToss && Top && Button && Loader && adaptive) {
+  if (isToss && tdsReady) {
+    const { Top, Button, Loader } = tds;
+    const { adaptive } = colors;
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF" }}>
         <Top
@@ -191,22 +182,7 @@ function Analyzing() {
             </>
           ) : (
             <>
-              {Loader ? (
-                <Loader size="large" />
-              ) : (
-                <div style={{ width: 64, height: 64, position: "relative" }}>
-                  <div
-                    style={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: "50%",
-                      border: "3px solid #E5E8EB",
-                      borderTopColor: "#3182F6",
-                      animation: "tds-analyzing-spin 1s linear infinite",
-                    }}
-                  />
-                </div>
-              )}
+              <Loader size="large" />
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: 1.6 }}>
                   {statusText}

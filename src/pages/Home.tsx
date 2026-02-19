@@ -11,20 +11,7 @@ import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { useToss } from "../hooks/useToss";
 import { usePriceStore } from "../store/priceStore";
 import { isTossEnvironment } from "../utils/env";
-
-let Top: any, Button: any, ListHeader: any, ListFooter: any;
-let adaptive: any;
-try {
-  const tds = require("@toss/tds-mobile");
-  Top = tds.Top;
-  Button = tds.Button;
-  ListHeader = tds.ListHeader;
-  ListFooter = tds.ListFooter;
-  const colors = require("@toss/tds-colors");
-  adaptive = colors.adaptive;
-} catch {
-  // TDS not available in non-Toss env
-}
+import { useTDS } from "../utils/tds";
 
 function Home() {
   const navigate = useNavigate();
@@ -33,6 +20,7 @@ function Home() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { items: recent } = useRecentComparisons();
   const { isAvailable: isTossAvailable, openCamera, fetchAlbumPhotos } = useToss();
+  const { tds, colors, ready: tdsReady } = useTDS();
 
   useEffect(() => {
     const isToss = isTossEnvironment();
@@ -140,7 +128,9 @@ function Home() {
     />
   );
 
-  if (isToss && Top && Button && ListHeader && ListFooter && adaptive) {
+  if (isToss && tdsReady) {
+    const { Top, Button, ListHeader, ListFooter } = tds;
+    const { adaptive } = colors;
     return (
       <div>
         <Top
@@ -200,22 +190,18 @@ function Home() {
         ) : (
           <>
             {recent.slice(0, 3).map((r) => (
+              // @ts-expect-error TDS ListHeader props vary by version
               <ListHeader
                 key={r.id}
-                size="large"
-                horizontalPadding="medium"
-                verticalPadding="medium"
-                descriptionPosition="bottom"
-                rightAlignment="center"
-                a11yRightReflow={false}
-                titleWidthRatio={0.6}
                 title={
-                  <ListHeader.TitleParagraph color={adaptive.grey800}>
+                  // @ts-expect-error TDS ListHeader.TitleParagraph props
+                  <ListHeader.TitleParagraph color={adaptive.grey800} typography="t5" fontWeight="semibold">
                     {r.productName}
                   </ListHeader.TitleParagraph>
                 }
                 right={
-                  <ListHeader.RightArrow color={adaptive.grey400}>
+                  // @ts-expect-error TDS ListHeader.RightArrow props
+                  <ListHeader.RightArrow color={adaptive.grey400} typography="t7">
                     {r.savedAmount >= 0 ? "+" : "-"}
                     {new Intl.NumberFormat("ko-KR").format(Math.abs(r.savedAmount))}원
                   </ListHeader.RightArrow>

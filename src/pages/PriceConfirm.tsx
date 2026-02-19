@@ -8,26 +8,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
 import { isTossEnvironment } from "../utils/env";
-
-let Post: any, ListRow: any, List: any, FixedBottomCTA: any, CTAButton: any;
-let ListHeader: any, TextField: any, Menu: any, Button: any;
-let adaptive: any;
-try {
-  const tds = require("@toss/tds-mobile");
-  Post = tds.Post;
-  ListRow = tds.ListRow;
-  List = tds.List;
-  FixedBottomCTA = tds.FixedBottomCTA;
-  CTAButton = tds.CTAButton;
-  ListHeader = tds.ListHeader;
-  TextField = tds.TextField;
-  Menu = tds.Menu;
-  Button = tds.Button;
-  const colors = require("@toss/tds-colors");
-  adaptive = colors.adaptive;
-} catch {
-  // TDS not available
-}
+import { useTDS } from "../utils/tds";
 
 const getCurrencySymbol = (currency: string): string => {
   const symbols: Record<string, string> = {
@@ -134,9 +115,12 @@ function PriceConfirm() {
     compareResult.localPrice != null && compareResult.localCurrency;
 
   const isToss = isTossEnvironment();
-  const useTDS = isToss && !!(Post && ListRow && List && FixedBottomCTA && CTAButton && ListHeader && TextField && Menu && Button && adaptive);
+  const { tds, colors, ready: tdsReady } = useTDS();
+  const shouldUseTDS = isToss && tdsReady;
 
-  if (useTDS) {
+  if (shouldUseTDS) {
+    const { Post, ListRow, List, FixedBottomCTA, CTAButton, ListHeader, TextField, Menu } = tds;
+    const { adaptive } = colors;
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF", paddingBottom: 120 }}>
         <Post.H1 paddingBottom={24}>가격확인</Post.H1>
@@ -188,16 +172,15 @@ function PriceConfirm() {
               />
             </List>
 
+            {/* @ts-expect-error TDS FixedBottomCTA/CTAButton API */}
             <FixedBottomCTA.Double
               leftButton={
-                <CTAButton color="dark" variant="weak" display="block" onClick={handleEdit}>
-                  수정
-                </CTAButton>
+                // @ts-expect-error TDS CTAButton props
+                <CTAButton color="dark" variant="weak" display="block" onClick={handleEdit} label="수정" />
               }
               rightButton={
-                <CTAButton display="block" onClick={handleConfirm}>
-                  맞아요
-                </CTAButton>
+                // @ts-expect-error TDS CTAButton props
+                <CTAButton display="block" onClick={handleConfirm} label="맞아요" />
               }
             />
           </>
@@ -206,147 +189,79 @@ function PriceConfirm() {
         {(editMode || !hasAiPrice) && (
           <>
             <div style={{ padding: "0 20px" }}>
-              {ListHeader ? (
-                <ListHeader
-                  size="large"
-                  horizontalPadding="small"
-                  verticalPadding="small"
-                  descriptionPosition="top"
-                  rightAlignment="center"
-                  a11yRightReflow={false}
-                  titleWidthRatio={0.6}
-                  title={
-                    Menu ? (
-                      <Menu.Trigger
-                        open={currencyMenuOpen}
-                        onOpen={() => setCurrencyMenuOpen(true)}
-                        onClose={() => setCurrencyMenuOpen(false)}
-                        placement="bottom-start"
-                        dropdown={
-                          <Menu.Dropdown>
-                            {CURRENCY_OPTIONS.map((opt) => (
-                              <Menu.DropdownCheckItem
-                                key={opt.value}
-                                checked={editCurrency === opt.value}
-                                onCheckedChange={(checked: boolean) => {
-                                  if (checked) {
-                                    setEditCurrency(opt.value);
-                                    setCurrencyMenuOpen(false);
-                                  }
-                                }}
-                              >
-                                {opt.label}
-                              </Menu.DropdownCheckItem>
-                            ))}
-                          </Menu.Dropdown>
-                        }
-                      >
-                        <ListHeader.TitleSelector color={adaptive.grey800}>
-                          {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
-                        </ListHeader.TitleSelector>
-                      </Menu.Trigger>
-                    ) : (
-                      <ListHeader.TitleParagraph color={adaptive.grey800}>
-                        {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
-                      </ListHeader.TitleParagraph>
-                    )
-                  }
-                  description={
-                    <ListHeader.DescriptionParagraph>
-                      가격수정
-                    </ListHeader.DescriptionParagraph>
-                  }
-                />
-              ) : (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, color: "#8B95A1", marginBottom: 8 }}>
-                    {hasAiPrice ? "가격 수정" : "가격을 직접 입력해주세요"}
-                  </div>
-                  <select
-                    value={editCurrency}
-                    onChange={(e) => setEditCurrency(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "12px 16px",
-                      borderRadius: 12,
-                      border: "1px solid #E5E8EB",
-                      backgroundColor: "#FFFFFF",
-                      fontSize: 16,
-                      color: "#191F28",
-                    }}
+              {/* @ts-expect-error TDS ListHeader props vary by version */}
+              <ListHeader
+                title={
+                  <Menu.Trigger
+                    open={currencyMenuOpen}
+                    onOpen={() => setCurrencyMenuOpen(true)}
+                    onClose={() => setCurrencyMenuOpen(false)}
+                    placement="bottom-start"
+                    dropdown={
+                      <Menu.Dropdown>
+                        {CURRENCY_OPTIONS.map((opt) => (
+                          <Menu.DropdownCheckItem
+                            key={opt.value}
+                            checked={editCurrency === opt.value}
+                            onCheckedChange={(checked: boolean) => {
+                              if (checked) {
+                                setEditCurrency(opt.value);
+                                setCurrencyMenuOpen(false);
+                              }
+                            }}
+                          >
+                            {opt.label}
+                          </Menu.DropdownCheckItem>
+                        ))}
+                      </Menu.Dropdown>
+                    }
                   >
-                    {CURRENCY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
+                    {/* @ts-expect-error TDS TitleSelector props */}
+                  <ListHeader.TitleSelector color={adaptive.grey800} typography="t5">
+                      {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
+                    </ListHeader.TitleSelector>
+                  </Menu.Trigger>
+                }
+                description={
+                  <ListHeader.DescriptionParagraph>
+                    가격수정
+                  </ListHeader.DescriptionParagraph>
+                }
+              />
 
               <div style={{ marginBottom: 24 }}>
-                {TextField?.Clearable ? (
-                  <TextField.Clearable
-                    variant="box"
-                    hasError={false}
-                    label="가격"
-                    labelOption="sustain"
-                    value={editPrice}
-                    onChange={(e: any) => {
-                      const val = typeof e === "string" ? e : e?.target?.value || "";
-                      if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
-                        setEditPrice(val);
-                      }
-                    }}
-                    placeholder={`${getCurrencySymbol(editCurrency)} 숫자 입력`}
-                    type="tel"
-                  />
-                ) : (
-                  <>
-                    <label style={{ display: "block", fontSize: 13, color: "#8B95A1", marginBottom: 8 }}>
-                      가격
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={editPrice}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
-                          setEditPrice(val);
-                        }
-                      }}
-                      placeholder="0"
-                      style={{
-                        width: "100%",
-                        padding: "14px 16px",
-                        borderRadius: 12,
-                        border: "1px solid #E5E8EB",
-                        backgroundColor: "#FFFFFF",
-                        fontSize: 18,
-                        color: "#191F28",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                  </>
-                )}
+                <TextField.Clearable
+                  variant="box"
+                  hasError={false}
+                  label="가격"
+                  labelOption="sustain"
+                  value={editPrice}
+                  onChange={(e: any) => {
+                    const val = typeof e === "string" ? e : e?.target?.value || "";
+                    if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                      setEditPrice(val);
+                    }
+                  }}
+                  placeholder={`${getCurrencySymbol(editCurrency)} 숫자 입력`}
+                  type="tel"
+                />
               </div>
             </div>
 
+            {/* @ts-expect-error TDS FixedBottomCTA/CTAButton API */}
             <FixedBottomCTA.Double
               leftButton={
                 editMode ? (
-                  <CTAButton color="dark" variant="weak" display="block" onClick={() => setEditMode(false)}>
-                    취소
-                  </CTAButton>
+                  // @ts-expect-error TDS CTAButton props
+                  <CTAButton color="dark" variant="weak" display="block" onClick={() => setEditMode(false)} label="취소" />
                 ) : (
-                  <CTAButton color="dark" variant="weak" display="block" onClick={handleClose}>
-                    취소
-                  </CTAButton>
+                  // @ts-expect-error TDS CTAButton props
+                  <CTAButton color="dark" variant="weak" display="block" onClick={handleClose} label="취소" />
                 )
               }
               rightButton={
-                <CTAButton display="block" onClick={handleEditSubmit}>
-                  확인
-                </CTAButton>
+                // @ts-expect-error TDS CTAButton props
+                <CTAButton display="block" onClick={handleEditSubmit} label="확인" />
               }
             />
           </>

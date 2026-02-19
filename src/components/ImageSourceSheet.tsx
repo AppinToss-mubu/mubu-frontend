@@ -5,15 +5,7 @@
  */
 
 import { isTossEnvironment } from "../utils/env";
-
-let BottomSheet: any, Button: any;
-try {
-  const tds = require("@toss/tds-mobile");
-  BottomSheet = tds.BottomSheet;
-  Button = tds.Button;
-} catch {
-  // TDS not available
-}
+import { useTDS } from "../utils/tds";
 
 interface ImageSourceSheetProps {
   open: boolean;
@@ -31,8 +23,10 @@ export function ImageSourceSheet({
   showCamera = true,
 }: ImageSourceSheetProps) {
   const isToss = isTossEnvironment();
+  const { tds, ready: tdsReady } = useTDS();
 
-  if (isToss && BottomSheet && Button) {
+  if (isToss && tdsReady) {
+    const { BottomSheet, Button } = tds;
     return (
       <BottomSheet
         header={

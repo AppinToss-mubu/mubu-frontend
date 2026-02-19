@@ -11,22 +11,7 @@ import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { usePriceStore } from "../store/priceStore";
 import AdBannerSlot from "../components/AdBannerSlot";
 import { isTossEnvironment } from "../utils/env";
-
-let ListRow: any, NumericSpinner: any, Top: any, Button: any, Asset: any, Text: any;
-let adaptive: any;
-try {
-  const tds = require("@toss/tds-mobile");
-  ListRow = tds.ListRow;
-  NumericSpinner = tds.NumericSpinner;
-  Top = tds.Top;
-  Button = tds.Button;
-  Asset = tds.Asset;
-  Text = tds.Text;
-  const colors = require("@toss/tds-colors");
-  adaptive = colors.adaptive;
-} catch {
-  // TDS not available
-}
+import { useTDS } from "../utils/tds";
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ko-KR").format(amount);
@@ -127,9 +112,13 @@ function Result() {
   };
 
   const isToss = isTossEnvironment();
-  const useTDS = isToss && !!(ListRow && NumericSpinner && Top && Button && Asset && Text && adaptive);
+  const { tds, colors, ready: tdsReady } = useTDS();
+  const shouldUseTDS = isToss && tdsReady;
 
-  if (useTDS) {
+  if (shouldUseTDS) {
+    const { ListRow, NumericSpinner, Top, Button, Asset } = tds;
+    const { adaptive } = colors;
+
     return (
       <div style={{ paddingBottom: 100 }}>
         <ListRow
@@ -146,64 +135,21 @@ function Result() {
         />
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 20px" }}>
-          {NumericSpinner ? (
-            <NumericSpinner
-              size="large"
-              number={quantity}
-              minNumber={1}
-              maxNumber={999}
-              onChange={(n: number) => setQuantity(n)}
-            />
-          ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <button
-                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                disabled={quantity <= 1}
-                style={{
-                  width: 36, height: 36, borderRadius: "50%",
-                  border: "1px solid #E5E8EB", backgroundColor: "#F9FAFB",
-                  fontSize: 18, cursor: quantity > 1 ? "pointer" : "not-allowed",
-                  opacity: quantity > 1 ? 1 : 0.5,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#3182F6",
-                }}
-              >
-                −
-              </button>
-              <span style={{ fontSize: 18, fontWeight: 700, minWidth: 24, textAlign: "center", color: "#191F28" }}>
-                {quantity}
-              </span>
-              <button
-                onClick={() => setQuantity((prev) => prev + 1)}
-                style={{
-                  width: 36, height: 36, borderRadius: "50%",
-                  border: "1px solid #E5E8EB", backgroundColor: "#F9FAFB",
-                  fontSize: 18, cursor: "pointer",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#3182F6",
-                }}
-              >
-                +
-              </button>
-            </div>
-          )}
+          {/* @ts-expect-error TDS NumericSpinner onChange type */}
+          <NumericSpinner number={quantity} minNumber={1} maxNumber={999} onChange={(n: number) => setQuantity(n)} size="large" />
         </div>
 
         <div style={{ padding: "0 20px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              {Asset ? (
-                <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-down-mono" color={adaptive.blue500} aria-hidden={true} />
-              ) : null}
+              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-down-mono" color={adaptive.blue500} aria-hidden={true} />
               <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>현지단가</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: "#191F28" }}>
                 {localUnitPrice.toLocaleString()}{currencySymbol}
               </div>
             </div>
             <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              {Asset ? (
-                <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-up-mono" color={adaptive.blue500} aria-hidden={true} />
-              ) : null}
+              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-up-mono" color={adaptive.blue500} aria-hidden={true} />
               <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>한국단가</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: "#191F28" }}>
                 {hasKoreaPrice ? `₩${formatCurrency(koreaUnitPrice)}` : "₩0"}
@@ -213,9 +159,7 @@ function Result() {
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              {Asset ? (
-                <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-down-mono" color={adaptive.blue500} aria-hidden={true} />
-              ) : null}
+              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-down-mono" color={adaptive.blue500} aria-hidden={true} />
               <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>현지총액</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#191F28" }}>
                 {localTotal.toLocaleString()}{currencySymbol}
@@ -225,9 +169,7 @@ function Result() {
               </div>
             </div>
             <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              {Asset ? (
-                <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-up-mono" color={adaptive.blue500} aria-hidden={true} />
-              ) : null}
+              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-up-mono" color={adaptive.blue500} aria-hidden={true} />
               <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>한국총액</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#191F28" }}>
                 {hasKoreaPrice ? `₩${formatCurrency(koreaTotal)}` : "₩0"}
@@ -292,40 +234,29 @@ function Result() {
                 </Top.SubtitleParagraph>
               }
               lower={
-                Top.LowerCTA ? (
-                  <Top.LowerCTA
-                    type="2-button"
-                    leftButton={
-                      <Top.LowerCTAButton
-                        color="dark"
-                        variant="weak"
-                        display="block"
-                        onClick={handleViewKoreaPrice}
-                        disabled={!externalLinkUrl}
-                      >
-                        한국가격 보기
-                      </Top.LowerCTAButton>
-                    }
-                    rightButton={
-                      <Top.LowerCTAButton
-                        display="block"
-                        onClick={handlePurchase}
-                        disabled={!externalLinkUrl}
-                      >
-                        구매함
-                      </Top.LowerCTAButton>
-                    }
-                  />
-                ) : (
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-                    <Button color="dark" variant="weak" display="block" onClick={handleViewKoreaPrice} disabled={!externalLinkUrl}>
+                <Top.LowerCTA
+                  type="2-button"
+                  leftButton={
+                    <Top.LowerCTAButton
+                      color="dark"
+                      variant="weak"
+                      display="block"
+                      onClick={handleViewKoreaPrice}
+                      disabled={!externalLinkUrl}
+                    >
                       한국가격 보기
-                    </Button>
-                    <Button display="block" onClick={handlePurchase} disabled={!externalLinkUrl}>
+                    </Top.LowerCTAButton>
+                  }
+                  rightButton={
+                    <Top.LowerCTAButton
+                      display="block"
+                      onClick={handlePurchase}
+                      disabled={!externalLinkUrl}
+                    >
                       구매함
-                    </Button>
-                  </div>
-                )
+                    </Top.LowerCTAButton>
+                  }
+                />
               }
             />
           </div>
