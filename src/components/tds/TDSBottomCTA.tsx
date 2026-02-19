@@ -14,6 +14,7 @@ interface TDSBottomCTASingleProps {
   background?: "default" | "none";
   hasSafeAreaPadding?: boolean;
   topAccessory?: React.ReactNode;
+  color?: "dark" | "primary";
   style?: React.CSSProperties;
 }
 
@@ -35,6 +36,7 @@ export function TDSBottomCTASingle({
   background = "default",
   hasSafeAreaPadding = true,
   topAccessory,
+  color = "dark",
   style,
 }: TDSBottomCTASingleProps) {
   const isToss = isTossEnvironment();
@@ -58,13 +60,14 @@ export function TDSBottomCTASingle({
     ...style,
   };
 
+  const bgColor = color === "primary" ? "#3182F6" : "#191F28";
   const buttonStyle: React.CSSProperties = isToss
     ? {
         width: "100%",
         padding: "16px 24px",
         borderRadius: 16,
         border: "none",
-        backgroundColor: disabled ? "#E5E8EB" : "#191F28",
+        backgroundColor: disabled ? "#E5E8EB" : bgColor,
         color: disabled ? "#8B95A1" : "#FFFFFF",
         fontSize: 17,
         fontWeight: 600,

@@ -66,6 +66,20 @@ npm run dev
 
 포트 5000에서 실행됩니다.
 
+## TDS 참조 문서
+
+`docs/tds/` 폴더에 TDS 공식 스펙 정리본이 있습니다.
+
+### 파운데이션
+- `docs/tds/foundation-colors.md` - 색상 토큰 (Grey, Blue, Red, Green 등)
+- `docs/tds/foundation-typography.md` - 폰트 체계 (t1~st13 토큰)
+
+### 기존 래퍼 컴포넌트 (8개, src/components/tds/)
+- Button, BottomSheet, Loader, TextField, NumericSpinner, ListRow, BottomNav, BottomCTA
+
+### 추가 컴포넌트 문서 (6개)
+- Toast, Dialog (AlertDialog + ConfirmDialog), Badge, Skeleton, Top, Tab
+
 ## Recent Changes
 
 - 2026-01-28: TDS 환경별 분기 적용 완료
@@ -92,3 +106,13 @@ npm run dev
   - PriceConfirm 페이지: 이미지 상단 배치, 통화 기호 표시
   - Analyzing 페이지: 분석 플로우에 추가
   - ImageSourceSheet: 업로드/촬영 탭 UI
+
+- 2026-02-19: TDS 공식 스펙 문서화 및 래퍼 컴포넌트 확장
+  - `docs/tds/` 에 16개 참조 문서 작성 (Colors, Typography, 14 components)
+  - TDSBottomCTA에 `color` prop 추가 (dark/primary 선택 가능)
+  - 신규 TDS 래퍼 컴포넌트 5개 추가:
+    - TDSToast (성공/에러/정보 피드백)
+    - TDSDialog (AlertDialog + ConfirmDialog)
+    - TDSBadge (상태 라벨)
+    - TDSSkeleton (로딩 플레이스홀더)
+    - TDSTop (페이지 헤더)
