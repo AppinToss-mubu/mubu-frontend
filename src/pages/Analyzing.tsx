@@ -54,7 +54,7 @@ function Analyzing() {
         clearInterval(interval);
         isNavigatingRef.current = true;
 
-        const targetUrl = `/price-confirm/${data.imageId}`;
+        const targetUrl = `/ad-gate/${data.imageId}`;
         console.log("[Analyzing] 네비게이션 시작:", targetUrl);
 
         setImageId(data.imageId);

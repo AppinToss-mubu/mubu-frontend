@@ -164,15 +164,19 @@ function PriceConfirm() {
           >
             {compareResult.productName || "상품명 인식 실패"}
           </h2>
-          <p
-            style={{
-              fontSize: 14,
-              color: "var(--muted)",
-              margin: 0,
-            }}
-          >
-            {compareResult.mallName || ""}
-          </p>
+          {compareResult.mallName && (
+            <p
+              style={{
+                fontSize: 12,
+                color: "var(--muted)",
+                margin: 0,
+                marginTop: 2,
+                opacity: 0.6,
+              }}
+            >
+              {compareResult.mallName}
+            </p>
+          )}
         </div>
 
         {!editMode && hasAiPrice && (

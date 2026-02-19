@@ -10,6 +10,7 @@ import { useSummary, useExternalLink } from "../hooks/usePriceCompare";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { usePriceStore } from "../store/priceStore";
 import { TDSNumericSpinner, TDSButton } from "../components/tds";
+import AdBannerSlot from "../components/AdBannerSlot";
 import { isTossEnvironment } from "../utils/env";
 
 const formatCurrency = (amount: number): string => {
@@ -563,6 +564,8 @@ function Result() {
           )}
         </div>
       )}
+
+      <AdBannerSlot placement="result-bottom" />
 
       <div
         style={{

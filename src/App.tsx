@@ -3,6 +3,7 @@ import "./App.css";
 import { AppShell } from "./components/AppShell";
 import Home from "./pages/Home";
 import Analyzing from "./pages/Analyzing";
+import AdGate from "./pages/AdGate";
 import PriceConfirm from "./pages/PriceConfirm";
 import Result from "./pages/Result";
 import Dashboard from "./pages/Dashboard";
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/analyzing" element={<Analyzing />} />
+          <Route path="/ad-gate/:imageId" element={<AdGate />} />
           <Route path="/price-confirm/:imageId" element={<PriceConfirm />} />
           <Route path="/result/:imageId" element={<Result />} />
           <Route path="/dashboard" element={<Dashboard />} />
