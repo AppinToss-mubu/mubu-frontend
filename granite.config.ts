@@ -22,7 +22,7 @@ export default defineConfig({
   brand: {
     displayName: "mubu", // 화면에 노출될 앱의 한글 이름으로 바꿔주세요.
     primaryColor: "#3182F6", // 화면에 노출될 앱의 기본 색상으로 바꿔주세요.
-    icon: '', // 화면에 노출될 앱의 아이콘 이미지 주소로 바꿔주세요. (아직 없으면 null)
+    icon: "", // 화면에 노출될 앱의 아이콘 이미지 주소로 바꿔주세요. (아직 없으면 null)
   },
   web: {
     host: getLocalIP(), // 앱 내 웹뷰에 사용될 host (자동으로 IP 감지: 시뮬레이터는 localhost, 실기기는 실제 IP)
@@ -32,6 +32,15 @@ export default defineConfig({
       build: "tsc -b && vite build", // 빌드 명령어 (webpack도 가능)
     },
   },
-  permissions: [], // 필요한 권한 추가 (카메라/앨범 권한)
+  permissions: [
+    {
+      name: "camera",
+      access: "access",
+    },
+    {
+      name: "photos",
+      access: "read",
+    },
+  ], // 카메라 및 앨범 권한 설정
   outdir: "dist", // 빌드 결과물 출력 디렉토리
 });
