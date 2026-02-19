@@ -1,8 +1,22 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
-import { TDSButton, TDSLoader } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
+
+let Asset: any, Text: any, FixedBottomCTA: any, Button: any, Loader: any;
+let adaptive: any;
+try {
+  const tds = require("@toss/tds-mobile");
+  Asset = tds.Asset;
+  Text = tds.Text;
+  FixedBottomCTA = tds.FixedBottomCTA;
+  Button = tds.Button;
+  Loader = tds.Loader;
+  const colors = require("@toss/tds-colors");
+  adaptive = colors.adaptive;
+} catch {
+  // TDS not available
+}
 
 type AdState = "prompt" | "loading" | "showing" | "done" | "failed";
 
@@ -39,31 +53,69 @@ function AdFailedView({ imageId, navigate, errorMsg }: { imageId: string; naviga
           <path d="M12 8v4M12 16h.01" stroke="#F04452" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       </div>
-      <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", lineHeight: "25.5px", marginBottom: 6 }}>
-        광고를 불러오지 못했어요
-      </div>
-      <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: "21px", marginBottom: 8 }}>
-        {countdown}초 후 결과 페이지로 이동해요
-      </div>
+      {Text && adaptive ? (
+        <>
+          <Text display="block" color={adaptive.grey800} typography="t5" fontWeight="semibold" textAlign="center">
+            광고를 불러오지 못했어요
+          </Text>
+          <div style={{ height: 6 }} />
+          <Text display="block" color={adaptive.grey500} typography="st11" textAlign="center">
+            {countdown}초 후 결과 페이지로 이동해요
+          </Text>
+        </>
+      ) : (
+        <>
+          <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", lineHeight: "25.5px", marginBottom: 6 }}>
+            광고를 불러오지 못했어요
+          </div>
+          <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: "21px", marginBottom: 8 }}>
+            {countdown}초 후 결과 페이지로 이동해요
+          </div>
+        </>
+      )}
       {errorMsg && (
-        <div style={{ fontSize: 12, color: "#B0B8C1", lineHeight: "18px", marginBottom: 20, wordBreak: "break-all" }}>
+        <div style={{ fontSize: 12, color: "#B0B8C1", lineHeight: "18px", marginTop: 8, marginBottom: 20, wordBreak: "break-all" }}>
           {errorMsg}
         </div>
       )}
-      <TDSButton
-        onClick={() => {
-          if (!navigatedRef.current) {
-            navigatedRef.current = true;
-            navigate(`/price-confirm/${imageId}`, { replace: true });
-          }
-        }}
-        color="primary"
-        variant="fill"
-        size="large"
-        display="full"
-      >
-        바로 결과 보기
-      </TDSButton>
+      {Button ? (
+        <div style={{ marginTop: 20 }}>
+          <Button
+            display="block"
+            onClick={() => {
+              if (!navigatedRef.current) {
+                navigatedRef.current = true;
+                navigate(`/price-confirm/${imageId}`, { replace: true });
+              }
+            }}
+          >
+            바로 결과 보기
+          </Button>
+        </div>
+      ) : (
+        <button
+          onClick={() => {
+            if (!navigatedRef.current) {
+              navigatedRef.current = true;
+              navigate(`/price-confirm/${imageId}`, { replace: true });
+            }
+          }}
+          style={{
+            marginTop: 20,
+            width: "100%",
+            padding: "16px 24px",
+            borderRadius: 14,
+            border: "none",
+            backgroundColor: "#3182F6",
+            color: "#FFFFFF",
+            fontSize: 16,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          바로 결과 보기
+        </button>
+      )}
     </div>
   );
 }
@@ -185,6 +237,8 @@ function AdGate() {
     return null;
   }
 
+  const useTDS = !!(Asset && Text && FixedBottomCTA && Button && Loader && adaptive);
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -196,116 +250,81 @@ function AdGate() {
 
         {adState === "prompt" && (
           <>
-            <div style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              backgroundColor: "#E8F3FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 24,
-            }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4" stroke="#3182F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="12" r="10" stroke="#3182F6" strokeWidth="2" fill="none"/>
-              </svg>
-            </div>
-
-            <div style={{
-              fontSize: 22,
-              fontWeight: 700,
-              color: "#191F28",
-              textAlign: "center",
-              lineHeight: "31px",
-              marginBottom: 8,
-            }}>
-              분석이 완료되었어요!
-            </div>
-
-            <div style={{
-              fontSize: 15,
-              fontWeight: 500,
-              color: "#8B95A1",
-              textAlign: "center",
-              lineHeight: "22.5px",
-              marginBottom: 32,
-            }}>
-              짧은 광고를 시청하면{"\n"}가격 비교 결과를 확인할 수 있어요
-            </div>
-
-            <div style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-            }}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                padding: "16px 20px",
-                borderRadius: 16,
-                backgroundColor: "#F9FAFB",
-              }}>
+            {useTDS ? (
+              <>
+                <Asset.Image
+                  frameShape={Asset.frameShape.CleanW100}
+                  backgroundColor="transparent"
+                  src="https://static.toss.im/3d-emojis/u1F31E.png"
+                  alt="분석 완료"
+                  style={{ aspectRatio: "1/1" }}
+                />
+                <div style={{ height: 24 }} />
+                <Text
+                  display="block"
+                  color={adaptive.grey800}
+                  typography="t2"
+                  fontWeight="bold"
+                  textAlign="center"
+                >
+                  분석이 완료되었어요!
+                </Text>
+                <Text
+                  display="block"
+                  color={adaptive.grey700}
+                  typography="t5"
+                  fontWeight="regular"
+                  textAlign="center"
+                >
+                  짧은 광고를 시청하면{"\n"}가격 비교 결과를 확인할 수 있어요.
+                </Text>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 48, marginBottom: 24 }}>🌞</div>
                 <div style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: "#E8F3FF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: "#191F28",
+                  textAlign: "center",
+                  lineHeight: "31px",
+                  marginBottom: 8,
                 }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="3" width="20" height="14" rx="2" stroke="#3182F6" strokeWidth="1.5"/>
-                    <path d="M8 21h8M12 17v4" stroke="#3182F6" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
+                  분석이 완료되었어요!
                 </div>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 500, color: "#191F28", lineHeight: "24px" }}>광고 시청</div>
-                  <div style={{ fontSize: 14, color: "#8B95A1", marginTop: 2, lineHeight: "21px" }}>약 15~30초 소요</div>
-                </div>
-              </div>
-
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                padding: "16px 20px",
-                borderRadius: 16,
-                backgroundColor: "#F9FAFB",
-              }}>
                 <div style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: "#F0FAF6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
+                  fontSize: 15,
+                  fontWeight: 500,
+                  color: "#8B95A1",
+                  textAlign: "center",
+                  lineHeight: "22.5px",
+                  marginBottom: 32,
                 }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="#03B26C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  짧은 광고를 시청하면{"\n"}가격 비교 결과를 확인할 수 있어요
                 </div>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 500, color: "#191F28", lineHeight: "24px" }}>결과 확인</div>
-                  <div style={{ fontSize: 14, color: "#8B95A1", marginTop: 2, lineHeight: "21px" }}>한국 최저가와 비교해볼 수 있어요</div>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </>
         )}
 
         {adState === "loading" && (
-          <TDSLoader size="large" type="primary" label={"광고를 불러오는 중이에요\n잠시만 기다려주세요"} />
+          Loader ? (
+            <Loader size="large" />
+          ) : (
+            <div style={{ textAlign: "center", color: "#8B95A1" }}>
+              광고를 불러오는 중이에요...
+            </div>
+          )
         )}
 
         {adState === "showing" && (
-          <TDSLoader size="large" type="primary" label={"광고 재생 중...\n곧 결과를 확인하실 수 있어요"} />
+          Loader ? (
+            <Loader size="large" />
+          ) : (
+            <div style={{ textAlign: "center", color: "#8B95A1" }}>
+              광고 재생 중...
+            </div>
+          )
         )}
 
         {adState === "failed" && (
@@ -314,39 +333,52 @@ function AdGate() {
       </div>
 
       {adState === "prompt" && (
-        <div style={{
-          padding: "0 24px",
-          paddingBottom: "max(24px, env(safe-area-inset-bottom))",
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-        }}>
-          <TDSButton
-            onClick={handleWatchAd}
-            color="primary"
-            variant="fill"
-            size="xlarge"
-            display="full"
-          >
+        useTDS && FixedBottomCTA ? (
+          <FixedBottomCTA.Single loading={false} onClick={handleWatchAd}>
             광고 시청 후 결과 보기
-          </TDSButton>
-          <button
-            onClick={handleSkip}
-            style={{
-              background: "none",
-              border: "none",
-              padding: "12px",
-              fontSize: 15,
-              fontWeight: 500,
-              color: "#8B95A1",
-              cursor: "pointer",
-              textAlign: "center",
-              lineHeight: "22.5px",
-            }}
-          >
-            다음에 할게요
-          </button>
-        </div>
+          </FixedBottomCTA.Single>
+        ) : (
+          <div style={{
+            padding: "0 24px",
+            paddingBottom: "max(24px, env(safe-area-inset-bottom))",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}>
+            <button
+              onClick={handleWatchAd}
+              style={{
+                width: "100%",
+                padding: "16px 24px",
+                borderRadius: 14,
+                border: "none",
+                backgroundColor: "#3182F6",
+                color: "#FFFFFF",
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              광고 시청 후 결과 보기
+            </button>
+            <button
+              onClick={handleSkip}
+              style={{
+                background: "none",
+                border: "none",
+                padding: "12px",
+                fontSize: 15,
+                fontWeight: 500,
+                color: "#8B95A1",
+                cursor: "pointer",
+                textAlign: "center",
+                lineHeight: "22.5px",
+              }}
+            >
+              다음에 할게요
+            </button>
+          </div>
+        )
       )}
     </div>
   );

@@ -1,15 +1,27 @@
 /**
  * 분석 중 페이지 (Analyzing)
- * - 스크린샷 3번 기준 UI
- * - 이미지 업로드 후 AI 분석 로딩 화면
+ * - Toss 환경: TDS v2 Top 컴포넌트 사용
+ * - 일반 웹: 기존 스타일 유지
  */
 
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompareWithImage } from "../hooks/usePriceCompare";
 import { usePriceStore } from "../store/priceStore";
-import { TDSButton } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
+
+let Top: any, Button: any, Loader: any;
+let adaptive: any;
+try {
+  const tds = require("@toss/tds-mobile");
+  Top = tds.Top;
+  Button = tds.Button;
+  Loader = tds.Loader;
+  const colors = require("@toss/tds-colors");
+  adaptive = colors.adaptive;
+} catch {
+  // TDS not available
+}
 
 function Analyzing() {
   const navigate = useNavigate();
@@ -23,7 +35,6 @@ function Analyzing() {
   const isNavigatingRef = useRef(false);
 
   useEffect(() => {
-    // 이미 시작했거나 네비게이션 중이면 스킵
     if (hasStartedRef.current || isNavigatingRef.current) {
       return;
     }
@@ -97,7 +108,6 @@ function Analyzing() {
     navigate("/");
   };
 
-  // 네비게이션 중이면 null 반환 (리렌더 방지)
   if (isNavigatingRef.current) {
     return null;
   }
@@ -108,42 +118,21 @@ function Analyzing() {
 
   const isToss = isTossEnvironment();
 
-  if (isToss) {
+  if (isToss && Top && Button && Loader && adaptive) {
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "16px 20px",
-            borderBottom: "1px solid #F2F4F6",
-          }}
-        >
-          <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0, color: "#191F28" }}>분석 중</h1>
-          <button
-            onClick={handleClose}
-            style={{
-              background: "transparent",
-              border: "none",
-              fontSize: 20,
-              cursor: "pointer",
-              color: "#8B95A1",
-              padding: 4,
-              width: 32,
-              height: 32,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            aria-label="닫기"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
+        <Top
+          title={
+            <Top.TitleParagraph size={22} color={adaptive.grey900}>
+              AI가 상품을 분석하고 있어요.
+            </Top.TitleParagraph>
+          }
+          subtitleBottom={
+            <Top.SubtitleParagraph color={adaptive.grey500}>
+              잠시만 기다려주세요.
+            </Top.SubtitleParagraph>
+          }
+        />
 
         <div
           style={{
@@ -151,9 +140,9 @@ function Analyzing() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            minHeight: "60vh",
+            minHeight: "50vh",
             gap: 24,
-            padding: "40px 20px",
+            padding: "0 20px",
           }}
         >
           {localError ? (
@@ -190,68 +179,38 @@ function Analyzing() {
                     localError.message || "상품 분석에 실패했어요. 다시 시도해주세요."
                   )}
                 </div>
-                <TDSButton
+                <Button
                   onClick={() => {
                     setPendingFile(null);
                     navigate("/?open=1");
                   }}
-                  color="primary"
-                  variant="fill"
-                  size="large"
                 >
                   다시 촬영하기
-                </TDSButton>
+                </Button>
               </div>
             </>
           ) : (
             <>
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  position: "relative",
-                }}
-              >
-                <div
-                  style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: "50%",
-                    border: "3px solid #E5E8EB",
-                    borderTopColor: "#3182F6",
-                    animation: "tds-analyzing-spin 1s linear infinite",
-                  }}
-                />
-              </div>
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 18, fontWeight: 700, color: "#191F28", marginBottom: 8 }}>
-                  AI가 상품을 분석하고 있어요
+              {Loader ? (
+                <Loader size="large" />
+              ) : (
+                <div style={{ width: 64, height: 64, position: "relative" }}>
+                  <div
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: "50%",
+                      border: "3px solid #E5E8EB",
+                      borderTopColor: "#3182F6",
+                      animation: "tds-analyzing-spin 1s linear infinite",
+                    }}
+                  />
                 </div>
+              )}
+              <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: 1.6 }}>
                   {statusText}
                 </div>
-              </div>
-              <div
-                style={{
-                  marginTop: 16,
-                  display: "flex",
-                  gap: 6,
-                  alignItems: "center",
-                }}
-              >
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      backgroundColor: "#3182F6",
-                      animation: `tds-analyzing-bounce 1.4s infinite ease-in-out`,
-                      animationDelay: `${i * 0.16}s`,
-                    }}
-                  />
-                ))}
               </div>
             </>
           )}
@@ -260,10 +219,6 @@ function Analyzing() {
         <style>{`
           @keyframes tds-analyzing-spin {
             to { transform: rotate(360deg); }
-          }
-          @keyframes tds-analyzing-bounce {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-            40% { transform: scale(1); opacity: 1; }
           }
         `}</style>
       </div>

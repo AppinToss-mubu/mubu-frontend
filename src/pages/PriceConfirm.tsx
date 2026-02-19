@@ -1,14 +1,33 @@
 /**
  * 가격 확인 페이지 (PriceConfirm)
- * - 스크린샷 4번 기준 UI
- * - 상품 이미지 상단, 감지된 가격 카드, 수정/맞아요 버튼
+ * - Toss 환경: TDS v2 Post.H1, ListRow, FixedBottomCTA, TextField, Menu 사용
+ * - 일반 웹: 기존 스타일 유지
  */
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
-import { TDSButton, TDSTextField } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
+
+let Post: any, ListRow: any, List: any, FixedBottomCTA: any, CTAButton: any;
+let ListHeader: any, TextField: any, Menu: any, Button: any;
+let adaptive: any;
+try {
+  const tds = require("@toss/tds-mobile");
+  Post = tds.Post;
+  ListRow = tds.ListRow;
+  List = tds.List;
+  FixedBottomCTA = tds.FixedBottomCTA;
+  CTAButton = tds.CTAButton;
+  ListHeader = tds.ListHeader;
+  TextField = tds.TextField;
+  Menu = tds.Menu;
+  Button = tds.Button;
+  const colors = require("@toss/tds-colors");
+  adaptive = colors.adaptive;
+} catch {
+  // TDS not available
+}
 
 const getCurrencySymbol = (currency: string): string => {
   const symbols: Record<string, string> = {
@@ -29,6 +48,21 @@ const getCurrencySymbol = (currency: string): string => {
   return symbols[currency.toUpperCase()] || currency;
 };
 
+const CURRENCY_OPTIONS = [
+  { value: "THB", label: "THB (฿) - 태국 바트" },
+  { value: "JPY", label: "JPY (¥) - 일본 엔" },
+  { value: "USD", label: "USD ($) - 미국 달러" },
+  { value: "AUD", label: "AUD (A$) - 호주 달러" },
+  { value: "CNY", label: "CNY (¥) - 중국 위안" },
+  { value: "EUR", label: "EUR (€) - 유로" },
+  { value: "SGD", label: "SGD (S$) - 싱가포르 달러" },
+  { value: "VND", label: "VND (₫) - 베트남 동" },
+  { value: "PHP", label: "PHP (₱) - 필리핀 페소" },
+  { value: "IDR", label: "IDR (Rp) - 인도네시아 루피아" },
+  { value: "HKD", label: "HKD (HK$) - 홍콩 달러" },
+  { value: "TWD", label: "TWD (NT$) - 대만 달러" },
+];
+
 function PriceConfirm() {
   const { imageId } = useParams<{ imageId: string }>();
   const navigate = useNavigate();
@@ -38,6 +72,7 @@ function PriceConfirm() {
   const [editMode, setEditMode] = useState(false);
   const [editPrice, setEditPrice] = useState("");
   const [editCurrency, setEditCurrency] = useState("THB");
+  const [currencyMenuOpen, setCurrencyMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!imageId || imageId === "undefined") {
@@ -60,10 +95,8 @@ function PriceConfirm() {
 
   const handleConfirm = () => {
     if (!compareResult) return;
-
     const price = compareResult.localPrice!;
     const curr = compareResult.localCurrency!;
-
     setLocalPrice(price);
     setCurrency(curr);
     setPriceSource("AI");
@@ -80,7 +113,6 @@ function PriceConfirm() {
       alert("올바른 가격을 입력해주세요.");
       return;
     }
-
     setLocalPrice(price);
     setCurrency(editCurrency);
     setPriceSource("USER");
@@ -102,42 +134,252 @@ function PriceConfirm() {
     compareResult.localPrice != null && compareResult.localCurrency;
 
   const isToss = isTossEnvironment();
+  const useTDS = isToss && !!(Post && ListRow && List && FixedBottomCTA && CTAButton && ListHeader && TextField && Menu && Button && adaptive);
+
+  if (useTDS) {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF", paddingBottom: 120 }}>
+        <Post.H1 paddingBottom={24}>가격확인</Post.H1>
+
+        {compareResult.image && (
+          <div style={{ padding: "0 20px", marginBottom: 20 }}>
+            <div style={{ borderRadius: 16, overflow: "hidden" }}>
+              <img
+                src={compareResult.image}
+                alt={compareResult.productName}
+                style={{ width: "100%", height: 240, objectFit: "cover" }}
+              />
+            </div>
+          </div>
+        )}
+
+        {!editMode && hasAiPrice && (
+          <>
+            <List>
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="1RowTypeA"
+                    top="감지된 가격"
+                    topProps={{ color: adaptive.grey700 }}
+                  />
+                }
+                verticalPadding="large"
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="1RowTypeC"
+                    top={`${currencySymbol}${compareResult.localPrice?.toLocaleString()}`}
+                    topProps={{ color: adaptive.grey800 }}
+                  />
+                }
+                verticalPadding="xlarge"
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="1RowTypeB"
+                    top="이 가격이 맞나요?"
+                    topProps={{ color: adaptive.grey800 }}
+                  />
+                }
+                verticalPadding="large"
+              />
+            </List>
+
+            <FixedBottomCTA.Double
+              leftButton={
+                <CTAButton color="dark" variant="weak" display="block" onClick={handleEdit}>
+                  수정
+                </CTAButton>
+              }
+              rightButton={
+                <CTAButton display="block" onClick={handleConfirm}>
+                  맞아요
+                </CTAButton>
+              }
+            />
+          </>
+        )}
+
+        {(editMode || !hasAiPrice) && (
+          <>
+            <div style={{ padding: "0 20px" }}>
+              {ListHeader ? (
+                <ListHeader
+                  size="large"
+                  horizontalPadding="small"
+                  verticalPadding="small"
+                  descriptionPosition="top"
+                  rightAlignment="center"
+                  a11yRightReflow={false}
+                  titleWidthRatio={0.6}
+                  title={
+                    Menu ? (
+                      <Menu.Trigger
+                        open={currencyMenuOpen}
+                        onOpen={() => setCurrencyMenuOpen(true)}
+                        onClose={() => setCurrencyMenuOpen(false)}
+                        placement="bottom-start"
+                        dropdown={
+                          <Menu.Dropdown>
+                            {CURRENCY_OPTIONS.map((opt) => (
+                              <Menu.DropdownCheckItem
+                                key={opt.value}
+                                checked={editCurrency === opt.value}
+                                onCheckedChange={(checked: boolean) => {
+                                  if (checked) {
+                                    setEditCurrency(opt.value);
+                                    setCurrencyMenuOpen(false);
+                                  }
+                                }}
+                              >
+                                {opt.label}
+                              </Menu.DropdownCheckItem>
+                            ))}
+                          </Menu.Dropdown>
+                        }
+                      >
+                        <ListHeader.TitleSelector color={adaptive.grey800}>
+                          {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
+                        </ListHeader.TitleSelector>
+                      </Menu.Trigger>
+                    ) : (
+                      <ListHeader.TitleParagraph color={adaptive.grey800}>
+                        {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
+                      </ListHeader.TitleParagraph>
+                    )
+                  }
+                  description={
+                    <ListHeader.DescriptionParagraph>
+                      가격수정
+                    </ListHeader.DescriptionParagraph>
+                  }
+                />
+              ) : (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 13, color: "#8B95A1", marginBottom: 8 }}>
+                    {hasAiPrice ? "가격 수정" : "가격을 직접 입력해주세요"}
+                  </div>
+                  <select
+                    value={editCurrency}
+                    onChange={(e) => setEditCurrency(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      borderRadius: 12,
+                      border: "1px solid #E5E8EB",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: 16,
+                      color: "#191F28",
+                    }}
+                  >
+                    {CURRENCY_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div style={{ marginBottom: 24 }}>
+                {TextField?.Clearable ? (
+                  <TextField.Clearable
+                    variant="box"
+                    hasError={false}
+                    label="가격"
+                    labelOption="sustain"
+                    value={editPrice}
+                    onChange={(e: any) => {
+                      const val = typeof e === "string" ? e : e?.target?.value || "";
+                      if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                        setEditPrice(val);
+                      }
+                    }}
+                    placeholder={`${getCurrencySymbol(editCurrency)} 숫자 입력`}
+                    type="tel"
+                  />
+                ) : (
+                  <>
+                    <label style={{ display: "block", fontSize: 13, color: "#8B95A1", marginBottom: 8 }}>
+                      가격
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={editPrice}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                          setEditPrice(val);
+                        }
+                      }}
+                      placeholder="0"
+                      style={{
+                        width: "100%",
+                        padding: "14px 16px",
+                        borderRadius: 12,
+                        border: "1px solid #E5E8EB",
+                        backgroundColor: "#FFFFFF",
+                        fontSize: 18,
+                        color: "#191F28",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+
+            <FixedBottomCTA.Double
+              leftButton={
+                editMode ? (
+                  <CTAButton color="dark" variant="weak" display="block" onClick={() => setEditMode(false)}>
+                    취소
+                  </CTAButton>
+                ) : (
+                  <CTAButton color="dark" variant="weak" display="block" onClick={handleClose}>
+                    취소
+                  </CTAButton>
+                )
+              }
+              rightButton={
+                <CTAButton display="block" onClick={handleEditSubmit}>
+                  확인
+                </CTAButton>
+              }
+            />
+          </>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: isToss ? "#FFFFFF" : "var(--bg)" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "var(--bg)" }}>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "16px 20px",
-          borderBottom: isToss ? "1px solid #F2F4F6" : "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
         }}
       >
-        <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0, color: isToss ? "#191F28" : undefined }}>가격 확인</h1>
+        <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>가격 확인</h1>
         <button
           onClick={handleClose}
           style={{
             background: "transparent",
             border: "none",
-            fontSize: isToss ? 20 : 24,
+            fontSize: 24,
             cursor: "pointer",
-            color: isToss ? "#8B95A1" : "var(--muted)",
+            color: "var(--muted)",
             padding: 4,
-            width: isToss ? 32 : undefined,
-            height: isToss ? 32 : undefined,
-            display: isToss ? "flex" : undefined,
-            alignItems: isToss ? "center" : undefined,
-            justifyContent: isToss ? "center" : undefined,
           }}
           aria-label="닫기"
         >
-          {isToss ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          ) : "×"}
+          ×
         </button>
       </div>
 
@@ -148,7 +390,7 @@ function PriceConfirm() {
               marginTop: 20,
               borderRadius: 16,
               overflow: "hidden",
-              border: isToss ? "none" : "1px solid var(--border)",
+              border: "1px solid var(--border)",
             }}
           >
             <img
@@ -170,7 +412,7 @@ function PriceConfirm() {
               fontWeight: 700,
               margin: 0,
               marginBottom: 4,
-              color: isToss ? "#191F28" : "var(--fg)",
+              color: "var(--fg)",
               lineHeight: "25.2px",
             }}
           >
@@ -180,10 +422,10 @@ function PriceConfirm() {
             <p
               style={{
                 fontSize: 12,
-                color: isToss ? "#B0B8C1" : "var(--muted)",
+                color: "var(--muted)",
                 margin: 0,
                 marginTop: 2,
-                opacity: isToss ? 1 : 0.6,
+                opacity: 0.6,
               }}
             >
               {compareResult.mallName}
@@ -197,119 +439,64 @@ function PriceConfirm() {
               marginTop: 24,
               padding: 20,
               borderRadius: 16,
-              backgroundColor: isToss ? "#F9FAFB" : "var(--card)",
-              border: isToss ? "none" : "1px solid var(--border)",
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
             }}
           >
-            <div
-              style={{
-                fontSize: 13,
-                color: isToss ? "#8B95A1" : "var(--muted)",
-                marginBottom: 8,
-              }}
-            >
+            <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
               감지된 가격
             </div>
-            <div
-              style={{
-                fontSize: 36,
-                fontWeight: 800,
-                color: isToss ? "#191F28" : "var(--fg)",
-              }}
-            >
+            <div style={{ fontSize: 36, fontWeight: 800, color: "var(--fg)" }}>
               {currencySymbol}
               {compareResult.localPrice?.toLocaleString()}
             </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: isToss ? "#B0B8C1" : "var(--muted)",
-                marginTop: 4,
-              }}
-            >
+            <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 4 }}>
               원본: {compareResult.localPrice?.toFixed(2)}
             </div>
 
-            <div
-              style={{
-                textAlign: "center",
-                marginTop: 24,
-                marginBottom: 16,
-                fontSize: 14,
-                color: isToss ? "#8B95A1" : "var(--muted)",
-              }}
-            >
+            <div style={{ textAlign: "center", marginTop: 24, marginBottom: 16, fontSize: 14, color: "var(--muted)" }}>
               이 가격이 맞나요?
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 12,
-              }}
-            >
-              {isTossEnvironment() ? (
-                <>
-                  <TDSButton
-                    onClick={handleEdit}
-                    color="primary"
-                    variant="weak"
-                    size="large"
-                  >
-                    <span>✎</span> 수정
-                  </TDSButton>
-                  <TDSButton
-                    onClick={handleConfirm}
-                    color="primary"
-                    variant="fill"
-                    size="large"
-                  >
-                    <span>✓</span> 맞아요
-                  </TDSButton>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={handleEdit}
-                    style={{
-                      padding: "14px 16px",
-                      borderRadius: 12,
-                      border: "1px solid var(--border)",
-                      backgroundColor: "var(--bg)",
-                      color: "var(--fg)",
-                      fontSize: 15,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <span>✎</span> 수정
-                  </button>
-                  <button
-                    onClick={handleConfirm}
-                    style={{
-                      padding: "14px 16px",
-                      borderRadius: 12,
-                      border: "none",
-                      backgroundColor: "#1f2937",
-                      color: "#ffffff",
-                      fontSize: 15,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <span>✓</span> 맞아요
-                  </button>
-                </>
-              )}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <button
+                onClick={handleEdit}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--bg)",
+                  color: "var(--fg)",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span>✎</span> 수정
+              </button>
+              <button
+                onClick={handleConfirm}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "none",
+                  backgroundColor: "#1f2937",
+                  color: "#ffffff",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span>✓</span> 맞아요
+              </button>
             </div>
           </div>
         )}
@@ -320,29 +507,16 @@ function PriceConfirm() {
               marginTop: 24,
               padding: 20,
               borderRadius: 16,
-              backgroundColor: isToss ? "#F9FAFB" : "var(--card)",
-              border: isToss ? "none" : "1px solid var(--border)",
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
             }}
           >
-            <div
-              style={{
-                fontSize: 13,
-                color: isToss ? "#8B95A1" : "var(--muted)",
-                marginBottom: 16,
-              }}
-            >
+            <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 16 }}>
               {hasAiPrice ? "가격 수정" : "가격을 직접 입력해주세요"}
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 13,
-                  color: isToss ? "#8B95A1" : "var(--muted)",
-                  marginBottom: 8,
-                }}
-              >
+              <label style={{ display: "block", fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
                 통화
               </label>
               <select
@@ -352,142 +526,79 @@ function PriceConfirm() {
                   width: "100%",
                   padding: "12px 16px",
                   borderRadius: 12,
-                  border: isToss ? "1px solid #E5E8EB" : "1px solid var(--border)",
-                  backgroundColor: isToss ? "#FFFFFF" : "var(--bg)",
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--bg)",
                   fontSize: 16,
-                  color: isToss ? "#191F28" : "var(--fg)",
+                  color: "var(--fg)",
                 }}
               >
-                <option value="THB">THB (฿) - 태국 바트</option>
-                <option value="JPY">JPY (¥) - 일본 엔</option>
-                <option value="USD">USD ($) - 미국 달러</option>
-                <option value="AUD">AUD (A$) - 호주 달러</option>
-                <option value="CNY">CNY (¥) - 중국 위안</option>
-                <option value="EUR">EUR (€) - 유로</option>
-                <option value="SGD">SGD (S$) - 싱가포르 달러</option>
-                <option value="VND">VND (₫) - 베트남 동</option>
-                <option value="PHP">PHP (₱) - 필리핀 페소</option>
-                <option value="IDR">IDR (Rp) - 인도네시아 루피아</option>
-                <option value="HKD">HKD (HK$) - 홍콩 달러</option>
-                <option value="TWD">TWD (NT$) - 대만 달러</option>
+                {CURRENCY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              {isTossEnvironment() ? (
-                <TDSTextField
-                  value={editPrice}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
-                      setEditPrice(val);
-                    }
-                  }}
-                  label="가격"
-                  placeholder="0"
-                  prefix={getCurrencySymbol(editCurrency)}
-                  inputMode="decimal"
-                  variant="box"
-                />
-              ) : (
-                <>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 13,
-                      color: "var(--muted)",
-                      marginBottom: 8,
-                    }}
-                  >
-                    가격
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={editPrice}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
-                        setEditPrice(val);
-                      }
-                    }}
-                    placeholder="0"
-                    style={{
-                      width: "100%",
-                      padding: "14px 16px",
-                      borderRadius: 12,
-                      border: "1px solid var(--border)",
-                      backgroundColor: "var(--bg)",
-                      fontSize: 18,
-                      color: "var(--fg)",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </>
-              )}
+              <label style={{ display: "block", fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
+                가격
+              </label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={editPrice}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                    setEditPrice(val);
+                  }
+                }}
+                placeholder="0"
+                style={{
+                  width: "100%",
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--bg)",
+                  fontSize: 18,
+                  color: "var(--fg)",
+                  boxSizing: "border-box",
+                }}
+              />
             </div>
 
-            {isTossEnvironment() ? (
-              <>
-                <TDSButton
-                  onClick={handleEditSubmit}
-                  color="primary"
-                  variant="fill"
-                  size="xlarge"
-                  display="full"
-                >
-                  확인
-                </TDSButton>
-                {editMode && (
-                  <TDSButton
-                    onClick={() => setEditMode(false)}
-                    color="primary"
-                    variant="weak"
-                    size="large"
-                    display="full"
-                    style={{ marginTop: 12 }}
-                  >
-                    취소
-                  </TDSButton>
-                )}
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleEditSubmit}
-                  style={{
-                    width: "100%",
-                    padding: "14px 16px",
-                    borderRadius: 12,
-                    border: "none",
-                    backgroundColor: "#1f2937",
-                    color: "#ffffff",
-                    fontSize: 16,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  확인
-                </button>
-                {editMode && (
-                  <button
-                    onClick={() => setEditMode(false)}
-                    style={{
-                      width: "100%",
-                      marginTop: 12,
-                      padding: "12px 16px",
-                      borderRadius: 12,
-                      border: "1px solid var(--border)",
-                      backgroundColor: "transparent",
-                      color: "var(--muted)",
-                      fontSize: 14,
-                      cursor: "pointer",
-                    }}
-                  >
-                    취소
-                  </button>
-                )}
-              </>
+            <button
+              onClick={handleEditSubmit}
+              style={{
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 12,
+                border: "none",
+                backgroundColor: "#1f2937",
+                color: "#ffffff",
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              확인
+            </button>
+            {editMode && (
+              <button
+                onClick={() => setEditMode(false)}
+                style={{
+                  width: "100%",
+                  marginTop: 12,
+                  padding: "12px 16px",
+                  borderRadius: 12,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "transparent",
+                  color: "var(--muted)",
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                취소
+              </button>
             )}
           </div>
         )}
