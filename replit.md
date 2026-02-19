@@ -119,16 +119,12 @@ npm run dev
 
 - 2026-02-19: 광고 수익화 인프라 구축
   - `docs/toss-ads-guide.md` - 토스 인앱 광고 SDK 종합 레퍼런스
-  - `docs/mubu-ad-strategy.md` - MUBU 광고 전략 (배치, 타이밍, 수익 모델)
+  - `docs/mubu-ad-strategy.md` - MUBU 광고 전략 (광고+제휴 커머스 수익 모델)
   - `src/pages/AdGate.tsx` - 전면 광고 게이트 페이지 (Toss 전용)
-    - 분석 완료 → 광고 시청 → 결과 확인 플로우
+    - 매 비교마다 광고 시청 → 결과 확인 (횟수 제한/구독 없음)
     - TDSConfirmDialog로 광고 시청 안내
-    - 일일 비교 횟수 초과 시 보상형 광고 제안
     - @cursor-todo: 실제 SDK 호출 연결 필요
-  - `src/components/AdBannerSlot.tsx` - 배너 광고 슬롯 (Result 페이지 하단)
-  - `src/store/priceStore.ts` - 일일 비교 횟수 추적
-    - localStorage 기반 날짜별 카운트 (자정 자동 리셋)
-    - 티어별 제한: guest 3회, free 5회, premium 무제한
-    - `canCompare()`, `incrementCompareCount()` 메서드
+  - `src/components/AdBannerSlot.tsx` - 배너 광고 슬롯 (Result 페이지 하단, Toss 전용)
   - 라우팅: Analyzing → AdGate(Toss) 또는 PriceConfirm(웹) 환경 분기
   - PriceConfirm: 쿠팡 출처 표시 축소 (12px, opacity 0.6)
+  - 수익 모델: 전면 광고 + 배너 광고 + 쿠팡 파트너스 (유료 구독 없음)
