@@ -1,10 +1,67 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
 import { TDSButton } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
 
 type AdState = "prompt" | "loading" | "showing" | "done" | "failed";
+
+function AdFailedView({ imageId, navigate }: { imageId: string; navigate: (path: string, opts?: any) => void }) {
+  const [countdown, setCountdown] = useState(3);
+  const navigatedRef = useRef(false);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setCountdown(2), 1000);
+    const t2 = setTimeout(() => setCountdown(1), 2000);
+    const t3 = setTimeout(() => {
+      if (!navigatedRef.current) {
+        navigatedRef.current = true;
+        navigate(`/price-confirm/${imageId}`, { replace: true });
+      }
+    }, 3000);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [imageId, navigate]);
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <div style={{
+        width: 72,
+        height: 72,
+        borderRadius: 20,
+        backgroundColor: "#FFF0F0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto 20px",
+      }}>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#F04452" strokeWidth="2"/>
+          <path d="M12 8v4M12 16h.01" stroke="#F04452" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </div>
+      <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", marginBottom: 6 }}>
+        광고를 불러오지 못했어요
+      </div>
+      <div style={{ fontSize: 14, color: "#8B95A1", marginBottom: 24 }}>
+        {countdown}초 후 결과 페이지로 이동해요
+      </div>
+      <TDSButton
+        onClick={() => {
+          if (!navigatedRef.current) {
+            navigatedRef.current = true;
+            navigate(`/price-confirm/${imageId}`, { replace: true });
+          }
+        }}
+        color="primary"
+        variant="fill"
+        size="large"
+        display="full"
+      >
+        바로 결과 보기
+      </TDSButton>
+    </div>
+  );
+}
 
 // 테스트용 광고 그룹 ID (실서비스 시 콘솔에서 발급받은 ID로 교체)
 const TEST_AD_GROUP_ID = "ait-ad-test-interstitial-id";
@@ -278,38 +335,7 @@ function AdGate() {
         )}
 
         {adState === "failed" && (
-          <div style={{ textAlign: "center" }}>
-            <div style={{
-              width: 72,
-              height: 72,
-              borderRadius: 20,
-              backgroundColor: "#FFF0F0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 20px",
-            }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="#F04452" strokeWidth="2"/>
-                <path d="M12 8v4M12 16h.01" stroke="#F04452" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <div style={{ fontSize: 17, fontWeight: 600, color: "#191F28", marginBottom: 6 }}>
-              광고를 불러오지 못했어요
-            </div>
-            <div style={{ fontSize: 14, color: "#8B95A1", marginBottom: 24 }}>
-              결과 페이지로 바로 이동할게요
-            </div>
-            <TDSButton
-              onClick={() => navigate(`/price-confirm/${imageId}`, { replace: true })}
-              color="primary"
-              variant="fill"
-              size="large"
-              display="full"
-            >
-              결과 보기
-            </TDSButton>
-          </div>
+          <AdFailedView imageId={imageId!} navigate={navigate} />
         )}
       </div>
 

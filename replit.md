@@ -137,3 +137,9 @@ npm run dev
     - 카메라/앨범 SDK 이미 useToss.ts에 구현 완료 확인
     - `npm install @apps-in-toss/web-framework` 후 바로 동작
     - 작업 체크리스트 + 유저 플로우 정리
+
+- 2026-02-19: 광고 중복 로드 충돌 수정
+  - Analyzing.tsx에서 광고 사전 로드 코드 제거 (중복 load 충돌 방지)
+  - AdGate에서만 load → show 순차 호출하도록 변경
+  - AdGate 광고 실패 시 3초 카운트다운 후 자동 결과 페이지 이동 추가
+  - cursor-handoff.md에 디버깅 팁 섹션 추가
