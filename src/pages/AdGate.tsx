@@ -195,7 +195,7 @@ function AdGate() {
     );
   }
 
-  const { Asset, Text, FixedBottomCTA, Loader } = tds;
+  const { Asset, Text, Button, Loader } = tds;
   const { adaptive } = colors;
 
   return (
@@ -204,6 +204,7 @@ function AdGate() {
       backgroundColor: "#FFFFFF",
       display: "flex",
       flexDirection: "column",
+      paddingBottom: 100,
     }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
 
@@ -226,6 +227,7 @@ function AdGate() {
             >
               분석이 완료되었어요!
             </Text>
+            <div style={{ height: 8 }} />
             <Text
               display="block"
               color={adaptive.grey700}
@@ -235,6 +237,12 @@ function AdGate() {
             >
               짧은 광고를 시청하면{"\n"}가격 비교 결과를 확인할 수 있어요.
             </Text>
+            <div style={{ height: 32 }} />
+            <div style={{ width: "100%", padding: "0 20px", boxSizing: "border-box" }}>
+              <Button display="block" onClick={handleWatchAd}>
+                광고 시청 후 결과 보기
+              </Button>
+            </div>
           </>
         )}
 
@@ -250,12 +258,6 @@ function AdGate() {
           <AdFailedView imageId={imageId!} navigate={navigate} errorMsg={adError} tds={tds} colors={colors} />
         )}
       </div>
-
-      {adState === "prompt" && (
-        <FixedBottomCTA loading={false} onClick={handleWatchAd}>
-          광고 시청 후 결과 보기
-        </FixedBottomCTA>
-      )}
     </div>
   );
 }

@@ -106,9 +106,7 @@ function Result() {
   };
 
   const handlePurchase = () => {
-    if (externalLinkUrl) {
-      window.open(externalLinkUrl, "_blank");
-    }
+    navigate("/");
   };
 
   const isToss = isTossEnvironment();

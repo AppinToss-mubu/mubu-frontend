@@ -40,10 +40,10 @@ export function ImageSourceSheet({
           showCamera
             ? [
                 <Button key="album" color="dark" variant="weak" display="block" onClick={onPickAlbum}>
-                  사진 촬영하기
+                  앨범에서 선택하기
                 </Button>,
                 <Button key="camera" display="block" onClick={onPickCamera}>
-                  앨범에서 선택하기
+                  사진 촬영하기
                 </Button>,
               ]
             : [

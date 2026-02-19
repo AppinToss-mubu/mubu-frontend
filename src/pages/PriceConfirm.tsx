@@ -119,10 +119,10 @@ function PriceConfirm() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { Post, ListRow, List, FixedBottomCTA, CTAButton, ListHeader, TextField, Menu } = tds;
+    const { Post, Text, Button, ListHeader, TextField, Menu } = tds;
     const { adaptive } = colors;
     return (
-      <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF", paddingBottom: 120 }}>
+      <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF", paddingBottom: 100 }}>
         <Post.H1 paddingBottom={24}>가격확인</Post.H1>
 
         {compareResult.image && (
@@ -138,124 +138,121 @@ function PriceConfirm() {
         )}
 
         {!editMode && hasAiPrice && (
-          <>
-            <List>
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="1RowTypeA"
-                    top="감지된 가격"
-                    topProps={{ color: adaptive.grey700 }}
-                  />
-                }
-                verticalPadding="large"
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="1RowTypeC"
-                    top={`${currencySymbol}${compareResult.localPrice?.toLocaleString()}`}
-                    topProps={{ color: adaptive.grey800 }}
-                  />
-                }
-                verticalPadding="xlarge"
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="1RowTypeB"
-                    top="이 가격이 맞나요?"
-                    topProps={{ color: adaptive.grey800 }}
-                  />
-                }
-                verticalPadding="large"
-              />
-            </List>
+          <div style={{ padding: "0 20px" }}>
+            <div style={{
+              backgroundColor: "#F2F4F6",
+              borderRadius: 16,
+              padding: "24px 20px",
+              textAlign: "center",
+              marginBottom: 16,
+            }}>
+              <Text display="block" color={adaptive.grey600} typography="t6" fontWeight="regular">
+                감지된 가격
+              </Text>
+              <div style={{ height: 8 }} />
+              <Text display="block" color={adaptive.grey900} typography="t1" fontWeight="bold">
+                {currencySymbol}{compareResult.localPrice?.toLocaleString()}
+              </Text>
+            </div>
 
-            <FixedBottomCTA.Double
-              leftButton={
-                <CTAButton color="dark" variant="weak" display="block" onClick={handleEdit} label="수정" />
-              }
-              rightButton={
-                <CTAButton display="block" onClick={handleConfirm} label="맞아요" />
-              }
-            />
-          </>
+            <div style={{
+              backgroundColor: "#F8F9FA",
+              borderRadius: 12,
+              padding: "16px 20px",
+              textAlign: "center",
+              marginBottom: 24,
+            }}>
+              <Text display="block" color={adaptive.grey800} typography="t4" fontWeight="medium">
+                이 가격이 맞나요?
+              </Text>
+            </div>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <Button color="dark" variant="weak" display="block" onClick={handleEdit}>
+                  수정
+                </Button>
+              </div>
+              <div style={{ flex: 1 }}>
+                <Button display="block" onClick={handleConfirm}>
+                  맞아요
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
 
         {(editMode || !hasAiPrice) && (
-          <>
-            <div style={{ padding: "0 20px" }}>
-              <ListHeader
-                title={
-                  <Menu.Trigger
-                    open={currencyMenuOpen}
-                    onOpen={() => setCurrencyMenuOpen(true)}
-                    onClose={() => setCurrencyMenuOpen(false)}
-                    placement="bottom-start"
-                    dropdown={
-                      <Menu.Dropdown>
-                        {CURRENCY_OPTIONS.map((opt) => (
-                          <Menu.DropdownCheckItem
-                            key={opt.value}
-                            checked={editCurrency === opt.value}
-                            onCheckedChange={(checked: boolean) => {
-                              if (checked) {
-                                setEditCurrency(opt.value);
-                                setCurrencyMenuOpen(false);
-                              }
-                            }}
-                          >
-                            {opt.label}
-                          </Menu.DropdownCheckItem>
-                        ))}
-                      </Menu.Dropdown>
-                    }
-                  >
-                  <ListHeader.TitleSelector color={adaptive.grey800} typography="t5">
-                      {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
-                    </ListHeader.TitleSelector>
-                  </Menu.Trigger>
-                }
-                description={
-                  <ListHeader.DescriptionParagraph>
-                    가격수정
-                  </ListHeader.DescriptionParagraph>
-                }
-              />
-
-              <div style={{ marginBottom: 24 }}>
-                <TextField.Clearable
-                  variant="box"
-                  hasError={false}
-                  label="가격"
-                  labelOption="sustain"
-                  value={editPrice}
-                  onChange={(e: any) => {
-                    const val = typeof e === "string" ? e : e?.target?.value || "";
-                    if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
-                      setEditPrice(val);
-                    }
-                  }}
-                  placeholder={`${getCurrencySymbol(editCurrency)} 숫자 입력`}
-                  type="tel"
-                />
-              </div>
-            </div>
-
-            <FixedBottomCTA.Double
-              leftButton={
-                editMode ? (
-                  <CTAButton color="dark" variant="weak" display="block" onClick={() => setEditMode(false)} label="취소" />
-                ) : (
-                  <CTAButton color="dark" variant="weak" display="block" onClick={handleClose} label="취소" />
-                )
+          <div style={{ padding: "0 20px" }}>
+            <ListHeader
+              title={
+                <Menu.Trigger
+                  open={currencyMenuOpen}
+                  onOpen={() => setCurrencyMenuOpen(true)}
+                  onClose={() => setCurrencyMenuOpen(false)}
+                  placement="bottom-start"
+                  dropdown={
+                    <Menu.Dropdown>
+                      {CURRENCY_OPTIONS.map((opt) => (
+                        <Menu.DropdownCheckItem
+                          key={opt.value}
+                          checked={editCurrency === opt.value}
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              setEditCurrency(opt.value);
+                              setCurrencyMenuOpen(false);
+                            }
+                          }}
+                        >
+                          {opt.label}
+                        </Menu.DropdownCheckItem>
+                      ))}
+                    </Menu.Dropdown>
+                  }
+                >
+                <ListHeader.TitleSelector color={adaptive.grey800} typography="t5">
+                    {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
+                  </ListHeader.TitleSelector>
+                </Menu.Trigger>
               }
-              rightButton={
-                <CTAButton display="block" onClick={handleEditSubmit} label="확인" />
+              description={
+                <ListHeader.DescriptionParagraph>
+                  가격수정
+                </ListHeader.DescriptionParagraph>
               }
             />
-          </>
+
+            <div style={{ marginBottom: 24 }}>
+              <TextField.Clearable
+                variant="box"
+                hasError={false}
+                label="가격"
+                labelOption="sustain"
+                value={editPrice}
+                onChange={(e: any) => {
+                  const val = typeof e === "string" ? e : e?.target?.value || "";
+                  if (val === "" || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                    setEditPrice(val);
+                  }
+                }}
+                placeholder={`${getCurrencySymbol(editCurrency)} 숫자 입력`}
+                type="tel"
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <Button color="dark" variant="weak" display="block" onClick={editMode ? () => setEditMode(false) : handleClose}>
+                  취소
+                </Button>
+              </div>
+              <div style={{ flex: 1 }}>
+                <Button display="block" onClick={handleEditSubmit}>
+                  확인
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     );
