@@ -309,7 +309,7 @@ function Analyzing() {
                   border: "none",
                   backgroundColor: "#1f2937",
                   color: "#ffffff",
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: 600,
                   cursor: "pointer",
                 }}

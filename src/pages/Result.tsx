@@ -476,7 +476,7 @@ function Result() {
             style={{
               padding: "14px 16px", borderRadius: 12,
               border: "1px solid var(--border)", backgroundColor: "var(--card)",
-              color: "var(--fg)", fontSize: 14, fontWeight: 600,
+              color: "var(--fg)", fontSize: 13, fontWeight: 600,
               cursor: externalLinkUrl ? "pointer" : "not-allowed",
               opacity: externalLinkUrl ? 1 : 0.5,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
@@ -490,7 +490,7 @@ function Result() {
             style={{
               padding: "14px 16px", borderRadius: 12,
               border: "none", backgroundColor: "#1f2937",
-              color: "#ffffff", fontSize: 14, fontWeight: 600,
+              color: "#ffffff", fontSize: 13, fontWeight: 600,
               cursor: externalLinkUrl ? "pointer" : "not-allowed",
               opacity: externalLinkUrl ? 1 : 0.5,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
@@ -506,7 +506,7 @@ function Result() {
             style={{
               width: "100%", padding: "14px 16px", borderRadius: 12,
               border: "none", backgroundColor: "#1f2937",
-              color: "#ffffff", fontSize: 14, fontWeight: 600,
+              color: "#ffffff", fontSize: 13, fontWeight: 600,
               cursor: "pointer", display: "flex",
               alignItems: "center", justifyContent: "center", gap: 6,
             }}

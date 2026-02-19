@@ -250,7 +250,7 @@ function Home() {
             border: "none",
             background: "var(--primary)",
             color: "var(--primary-contrast)",
-            fontSize: "16px",
+            fontSize: "15px",
             fontWeight: 800,
             display: "flex",
             alignItems: "center",

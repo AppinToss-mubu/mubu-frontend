@@ -380,7 +380,7 @@ function PriceConfirm() {
                   border: "1px solid var(--border)",
                   backgroundColor: "var(--bg)",
                   color: "var(--fg)",
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: 600,
                   cursor: "pointer",
                   display: "flex",
@@ -399,7 +399,7 @@ function PriceConfirm() {
                   border: "none",
                   backgroundColor: "#1f2937",
                   color: "#ffffff",
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: 600,
                   cursor: "pointer",
                   display: "flex",
@@ -488,7 +488,7 @@ function PriceConfirm() {
                 border: "none",
                 backgroundColor: "#1f2937",
                 color: "#ffffff",
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: 600,
                 cursor: "pointer",
               }}
@@ -506,7 +506,7 @@ function PriceConfirm() {
                   border: "1px solid var(--border)",
                   backgroundColor: "transparent",
                   color: "var(--muted)",
-                  fontSize: 14,
+                  fontSize: 13,
                   cursor: "pointer",
                 }}
               >
