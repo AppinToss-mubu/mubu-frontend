@@ -6,6 +6,9 @@ import { isTossEnvironment } from "../utils/env";
 
 type AdState = "prompt" | "loading" | "showing" | "done" | "failed";
 
+// 테스트용 광고 그룹 ID (실서비스 시 콘솔에서 발급받은 ID로 교체)
+const TEST_AD_GROUP_ID = "ait-ad-test-interstitial-id";
+
 function AdGate() {
   const { imageId } = useParams<{ imageId: string }>();
   const navigate = useNavigate();
@@ -25,31 +28,79 @@ function AdGate() {
     }
   }, []);
 
-  const handleWatchAd = () => {
+  const handleWatchAd = async () => {
+    if (!isTossEnvironment()) {
+      navigate(`/price-confirm/${imageId}`, { replace: true });
+      return;
+    }
+
     setAdState("loading");
 
-    // @cursor-todo: 실제 SDK 호출로 교체
-    // import { GoogleAdMob } from '@apps-in-toss/web-framework';
-    // const ad = await GoogleAdMob.loadAppsInTossAdMob({
-    //   adGroupId: 'ait-ad-test-interstitial-id', // 테스트용 → 실서비스 시 콘솔 발급 ID로 교체
-    //   type: 'interstitial',
-    // });
-    // ad.show();
-    // ad.addEventListener('dismissed', () => navigate(...));
-    simulateAdFlow();
-  };
+    try {
+      const { GoogleAdMob } = await import("@apps-in-toss/web-framework");
 
-  const simulateAdFlow = () => {
-    setAdState("loading");
+      // 광고 표시 함수 (먼저 정의)
+      const showAd = () => {
+        setAdState("showing");
 
-    setTimeout(() => {
-      setAdState("showing");
+        GoogleAdMob.showAppsInTossAdMob({
+          options: {
+            adGroupId: TEST_AD_GROUP_ID,
+          },
+          onEvent: (event) => {
+            switch (event.type) {
+              case "show":
+                console.log("광고 표시됨");
+                break;
+              case "impression":
+                console.log("광고 노출 (수익 카운트)");
+                break;
+              case "clicked":
+                console.log("광고 클릭됨");
+                break;
+              case "dismissed":
+                console.log("광고 닫힘");
+                setAdState("done");
+                navigate(`/price-confirm/${imageId}`, { replace: true });
+                break;
+              case "failedToShow":
+                console.error("광고 표시 실패");
+                setAdState("failed");
+                break;
+            }
+          },
+          onError: (error) => {
+            console.error("광고 보여주기 실패:", error);
+            setAdState("failed");
+          },
+        });
+      };
 
-      setTimeout(() => {
-        setAdState("done");
-        navigate(`/price-confirm/${imageId}`, { replace: true });
-      }, 1500);
-    }, 1000);
+      // 광고 로드
+      const loadCleanup = GoogleAdMob.loadAppsInTossAdMob({
+        options: {
+          adGroupId: TEST_AD_GROUP_ID,
+        },
+        onEvent: (event) => {
+          switch (event.type) {
+            case "loaded":
+              console.log("광고 로드 성공");
+              loadCleanup();
+              // 로드 완료 후 즉시 표시
+              showAd();
+              break;
+          }
+        },
+        onError: (error) => {
+          console.error("광고 불러오기 실패:", error);
+          loadCleanup();
+          setAdState("failed");
+        },
+      });
+    } catch (error) {
+      console.error("광고 SDK 로드 실패:", error);
+      setAdState("failed");
+    }
   };
 
   const handleClose = () => {

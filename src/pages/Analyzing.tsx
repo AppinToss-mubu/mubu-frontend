@@ -11,6 +11,9 @@ import { usePriceStore } from "../store/priceStore";
 import { TDSButton } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
 
+// 테스트용 광고 그룹 ID (실서비스 시 콘솔에서 발급받은 ID로 교체)
+const TEST_AD_GROUP_ID = "ait-ad-test-interstitial-id";
+
 function Analyzing() {
   const navigate = useNavigate();
   const { pendingFile, setImageId, setCompareResult, setPendingFile } =
@@ -21,6 +24,49 @@ function Analyzing() {
   const [isRateLimited, setIsRateLimited] = useState(false);
   const hasStartedRef = useRef(false);
   const isNavigatingRef = useRef(false);
+  const adLoadCleanupRef = useRef<(() => void) | null>(null);
+
+  // 광고 사전 로드 (Toss 환경에서만)
+  useEffect(() => {
+    if (!isTossEnvironment() || !pendingFile) {
+      return;
+    }
+
+    const preloadAd = async () => {
+      try {
+        const { GoogleAdMob } = await import("@apps-in-toss/web-framework");
+
+        // 광고 미리 로드 (AdGate에서 즉시 표시하기 위해)
+        adLoadCleanupRef.current = GoogleAdMob.loadAppsInTossAdMob({
+          options: {
+            adGroupId: TEST_AD_GROUP_ID,
+          },
+          onEvent: (event) => {
+            if (event.type === "loaded") {
+              console.log("[Analyzing] 광고 사전 로드 완료");
+              adLoadCleanupRef.current?.();
+              adLoadCleanupRef.current = null;
+            }
+          },
+          onError: (error) => {
+            console.warn("[Analyzing] 광고 사전 로드 실패 (무시):", error);
+            adLoadCleanupRef.current?.();
+            adLoadCleanupRef.current = null;
+          },
+        });
+      } catch (error) {
+        console.warn("[Analyzing] 광고 SDK 로드 실패 (무시):", error);
+      }
+    };
+
+    preloadAd();
+
+    return () => {
+      // 컴포넌트 언마운트 시 정리
+      adLoadCleanupRef.current?.();
+      adLoadCleanupRef.current = null;
+    };
+  }, [pendingFile]);
 
   useEffect(() => {
     // 이미 시작했거나 네비게이션 중이면 스킵

@@ -4,51 +4,31 @@
 
 ---
 
-## 1. 패키지 설치
+## 1. 패키지 설치 ✅ 완료
 
 ```bash
 npm install @apps-in-toss/web-framework
 ```
 
-> SDK 버전 1.0.3 이상 필요
+> SDK 버전 1.0.3 이상 필요  
+> **현재 설치된 버전:** `@apps-in-toss/web-framework@^1.9.1`
 
 ---
 
-## 2. 광고 SDK 연동 (AdGate)
+## 2. 광고 SDK 연동 (AdGate) ✅ 완료
 
 ### 파일: `src/pages/AdGate.tsx`
 
-`handleWatchAd()` 함수 안의 `simulateAdFlow()` 호출을 실제 SDK 호출로 교체:
+**구현 완료:** `handleWatchAd()` 함수에서 실제 SDK 호출로 교체됨.
 
-```typescript
-import { GoogleAdMob } from '@apps-in-toss/web-framework';
+**구현 내용:**
+- `GoogleAdMob.loadAppsInTossAdMob()`: 광고 로드
+- `GoogleAdMob.showAppsInTossAdMob()`: 광고 표시
+- 이벤트 처리: `loaded`, `show`, `impression`, `clicked`, `dismissed`, `failedToShow`
+- 에러 처리 포함
 
-const handleWatchAd = async () => {
-  setAdState("loading");
-
-  try {
-    const ad = await GoogleAdMob.loadAppsInTossAdMob({
-      adGroupId: 'ait-ad-test-interstitial-id', // 테스트용 ID
-      type: 'interstitial',
-    });
-
-    setAdState("showing");
-    ad.show();
-
-    ad.addEventListener('dismissed', () => {
-      setAdState("done");
-      navigate(`/price-confirm/${imageId}`, { replace: true });
-    });
-
-    ad.addEventListener('failed', () => {
-      setAdState("failed");
-    });
-  } catch (error) {
-    console.error('광고 로드 실패:', error);
-    setAdState("failed");
-  }
-};
-```
+**추가 구현:**
+- `src/pages/Analyzing.tsx`에서 광고 사전 로드 추가 (페이지 진입 시 미리 로드하여 AdGate에서 즉시 표시 가능)
 
 ### 테스트 광고 ID
 
@@ -100,17 +80,29 @@ const handleWatchAd = async () => {
 
 ## 5. 작업 체크리스트
 
+### ✅ 완료된 작업
+
+- [x] `npm install @apps-in-toss/web-framework` (완료: 2025-02-19)
+- [x] AdGate.tsx의 `simulateAdFlow()` → 실제 `GoogleAdMob` SDK 호출로 교체 (완료)
+- [x] Analyzing.tsx에서 광고 사전 로드 추가 (완료)
+
 ### 즉시 할 것
 
-- [ ] `npm install @apps-in-toss/web-framework`
-- [ ] AdGate.tsx의 `simulateAdFlow()` → 실제 `GoogleAdMob` SDK 호출로 교체
-- [ ] 실기기에서 테스트 광고 ID로 전면 광고 테스트
+- [ ] **실기기에서 테스트 광고 ID로 전면 광고 테스트**
+  - 샌드박스에서는 인앱 광고 미지원 → 실기기 필수
+  - 테스트 ID: `ait-ad-test-interstitial-id`
+  - 플로우: Home → 촬영 → Analyzing → AdGate → 광고 표시 확인
 
 ### 추후 할 것
 
 - [ ] 토스 콘솔에서 실제 전면형 광고 adGroupId 발급
+  - 콘솔 → 미니앱 → 인앱광고 → 광고 그룹 생성하기
+  - 전면형(Interstitial) 선택
+  - 생성 후 광고 그룹 ID 발급 (최대 2시간 소요)
 - [ ] 테스트 ID → 실제 ID 교체
+  - `AdGate.tsx`와 `Analyzing.tsx`의 `TEST_AD_GROUP_ID` 상수 변경
 - [ ] AdBannerSlot (`src/components/AdBannerSlot.tsx`) 배너 광고 연결 (현재 빈 자리만 마련)
+  - 토스 인앱 광고는 전면형/보상형만 제공 → 배너는 향후 확장용
 - [ ] 토스 로그인 연동 (별도 작업)
 
 ---
@@ -120,15 +112,15 @@ const handleWatchAd = async () => {
 ```
 [Toss 환경]
 Home → 상품 촬영 (openCamera SDK) / 앨범 선택 (fetchAlbumPhotos SDK)
-  → Analyzing (AI 분석)
-    → AdGate (전면 광고 시청)
+  → Analyzing (AI 분석 + 광고 사전 로드)
+    → AdGate (전면 광고 시청 - GoogleAdMob SDK)
       → PriceConfirm (가격 확인/수정)
         → Result (비교 결과 + 하단 배너 광고 + 쿠팡 링크)
 
 [일반 웹 환경]
 Home → 상품 촬영 (HTML input capture) / 앨범 선택 (HTML input file)
   → Analyzing (AI 분석)
-    → PriceConfirm (가격 확인/수정)
+    → PriceConfirm (가격 확인/수정) [AdGate 스킵]
       → Result (비교 결과 + 쿠팡 링크)
 ```
 
