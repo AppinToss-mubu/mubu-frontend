@@ -164,3 +164,10 @@ npm run dev
   - **패턴**: `useTDS()` 훅 → `{ tds, colors, ready }` → `if (isToss && tdsReady)` 가드 → 컴포넌트 구조분해
   - **비-Toss 환경**: 기존 원본 스타일 100% 유지, 콘솔 에러 없음
   - **기존 TDS 래퍼 컴포넌트** (`src/components/tds/`): AppShell의 TDSBottomNav만 사용 중, 나머지는 레거시
+
+- 2026-02-19: Toss 앱 실기기 테스트 후 UI/UX 버그 수정
+  - **PriceConfirm.tsx**: 통화 선택을 Menu.Dropdown → BottomSheet + BottomSheet.Select로 교체 (스크롤 독립적 팝업 UI)
+  - **Result.tsx**: TDS NumericSpinner 동작 불가 → TDSNumericSpinner 래퍼 컴포넌트로 교체
+  - **Result.tsx**: 절약 섹션 레이아웃 개선 (subtitleTop "총 절약" + title 금액 + subtitleBottom 설명)
+  - **ImageSourceSheet.tsx**: Button 배열 CTA → BottomSheet.DoubleCTA로 교체 (TDS 공식 패턴)
+  - **useToss.ts**: 권한 로직 확인 완료 (getPermission → openPermissionDialog 플로우, 캐시 후 재팝업 없음 정상)

@@ -10,6 +10,7 @@ import { useSummary, useExternalLink } from "../hooks/usePriceCompare";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { usePriceStore } from "../store/priceStore";
 import AdBannerSlot from "../components/AdBannerSlot";
+import { TDSNumericSpinner } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
 import { useTDS } from "../utils/tds";
 
@@ -114,7 +115,7 @@ function Result() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { ListRow, NumericSpinner, Top, Button, Asset } = tds;
+    const { ListRow, Top, Button, Asset } = tds;
     const { adaptive } = colors;
 
     return (
@@ -133,7 +134,13 @@ function Result() {
         />
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 20px" }}>
-          <NumericSpinner number={quantity} minNumber={1} maxNumber={999} onChange={(n: number) => setQuantity(n)} size="large" />
+          <TDSNumericSpinner
+            value={quantity}
+            onChange={setQuantity}
+            min={1}
+            max={999}
+            size="large"
+          />
         </div>
 
         <div style={{ padding: "0 20px" }}>
@@ -220,13 +227,20 @@ function Result() {
         ) : (
           <div style={{ padding: "24px 20px 0" }}>
             <Top
-              title={<Top.TitleParagraph size={28}>{`${Math.abs(savedTotal).toLocaleString()}원`}</Top.TitleParagraph>}
+              subtitleTop={
+                <Top.SubtitleParagraph size={13}>총 절약</Top.SubtitleParagraph>
+              }
+              title={
+                <Top.TitleParagraph size={28}>
+                  {savedTotal >= 0 ? "+" : "-"} {Math.abs(savedTotal).toLocaleString()}원
+                </Top.TitleParagraph>
+              }
               subtitleBottom={
                 <Top.SubtitleParagraph size={13}>
                   {savedTotal > 0
-                    ? "+ 총 절약 한국에서 사는 것이 더 저렴해요"
+                    ? "현지에서 사는 것이 더 저렴해요"
                     : savedTotal < 0
-                      ? "+ 총 절약 현지에서 사는 것이 더 저렴해요"
+                      ? "한국에서 사는 것이 더 저렴해요"
                       : "한국과 현지 가격이 동일해요"}
                 </Top.SubtitleParagraph>
               }
@@ -248,7 +262,6 @@ function Result() {
                     <Top.LowerCTAButton
                       display="block"
                       onClick={handlePurchase}
-                      disabled={!externalLinkUrl}
                     >
                       구매함
                     </Top.LowerCTAButton>

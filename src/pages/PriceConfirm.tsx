@@ -119,7 +119,7 @@ function PriceConfirm() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { Post, Text, Button, ListHeader, TextField, Menu } = tds;
+    const { Post, Text, Button, BottomSheet, TextField } = tds;
     const { adaptive } = colors;
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF", paddingBottom: 100 }}>
@@ -184,43 +184,53 @@ function PriceConfirm() {
 
         {(editMode || !hasAiPrice) && (
           <div style={{ padding: "0 20px" }}>
-            <ListHeader
-              title={
-                <Menu.Trigger
-                  open={currencyMenuOpen}
-                  onOpen={() => setCurrencyMenuOpen(true)}
-                  onClose={() => setCurrencyMenuOpen(false)}
-                  placement="bottom-start"
-                  dropdown={
-                    <Menu.Dropdown>
-                      {CURRENCY_OPTIONS.map((opt) => (
-                        <Menu.DropdownCheckItem
-                          key={opt.value}
-                          checked={editCurrency === opt.value}
-                          onCheckedChange={(checked: boolean) => {
-                            if (checked) {
-                              setEditCurrency(opt.value);
-                              setCurrencyMenuOpen(false);
-                            }
-                          }}
-                        >
-                          {opt.label}
-                        </Menu.DropdownCheckItem>
-                      ))}
-                    </Menu.Dropdown>
+            <Text display="block" color={adaptive.grey600} typography="t6" fontWeight="regular" style={{ marginBottom: 8 }}>
+              가격수정
+            </Text>
+
+            <button
+              onClick={() => setCurrencyMenuOpen(true)}
+              style={{
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 12,
+                border: "1px solid #E5E8EB",
+                backgroundColor: "#FFFFFF",
+                fontSize: 15,
+                fontWeight: 500,
+                color: "#191F28",
+                textAlign: "left",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <span>{CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}</span>
+              <span style={{ color: "#8B95A1", fontSize: 12 }}>▼</span>
+            </button>
+
+            <BottomSheet
+              open={currencyMenuOpen}
+              onClose={() => setCurrencyMenuOpen(false)}
+              header={<BottomSheet.Header>통화를 선택해주세요</BottomSheet.Header>}
+            >
+              <BottomSheet.Select
+                options={CURRENCY_OPTIONS.map((opt) => ({
+                  name: opt.label,
+                  value: opt.value,
+                }))}
+                value={editCurrency}
+                onChange={(e: any) => {
+                  const selected = e.target.value;
+                  if (selected) {
+                    setEditCurrency(selected);
+                    setCurrencyMenuOpen(false);
                   }
-                >
-                <ListHeader.TitleSelector color={adaptive.grey800} typography="t5">
-                    {CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}
-                  </ListHeader.TitleSelector>
-                </Menu.Trigger>
-              }
-              description={
-                <ListHeader.DescriptionParagraph>
-                  가격수정
-                </ListHeader.DescriptionParagraph>
-              }
-            />
+                }}
+              />
+            </BottomSheet>
 
             <div style={{ marginBottom: 24 }}>
               <TextField.Clearable

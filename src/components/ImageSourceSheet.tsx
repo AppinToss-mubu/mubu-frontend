@@ -38,19 +38,21 @@ export function ImageSourceSheet({
         onClose={onClose}
         cta={
           showCamera
-            ? [
-                <Button key="album" color="dark" variant="weak" display="block" onClick={onPickAlbum}>
-                  앨범에서 선택하기
-                </Button>,
-                <Button key="camera" display="block" onClick={onPickCamera}>
-                  사진 촬영하기
-                </Button>,
-              ]
-            : [
-                <Button key="album" display="block" onClick={onPickAlbum}>
-                  앨범에서 선택하기
-                </Button>,
-              ]
+            ? (
+                <BottomSheet.DoubleCTA
+                  leftButton={
+                    <Button variant="weak" color="dark" onClick={onPickAlbum}>
+                      앨범에서 선택
+                    </Button>
+                  }
+                  rightButton={
+                    <Button onClick={onPickCamera}>
+                      사진 촬영
+                    </Button>
+                  }
+                />
+              )
+            : <BottomSheet.CTA onClick={onPickAlbum}>앨범에서 선택하기</BottomSheet.CTA>
         }
       >
         <></>
