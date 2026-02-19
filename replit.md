@@ -171,3 +171,18 @@ npm run dev
   - **Result.tsx**: 절약 섹션 레이아웃 개선 (subtitleTop "총 절약" + title 금액 + subtitleBottom 설명)
   - **ImageSourceSheet.tsx**: Button 배열 CTA → BottomSheet.DoubleCTA로 교체 (TDS 공식 패턴)
   - **useToss.ts**: 권한 로직 확인 완료 (getPermission → openPermissionDialog 플로우, 캐시 후 재팝업 없음 정상)
+
+- 2026-02-19: TDS NumericSpinner 네이티브 연동 수정
+  - **원인**: TDS API는 `onNumberChange`/`number` prop인데 `onChange`/`value`로 호출하여 미동작
+  - **TDSNumericSpinner.tsx**: Toss 환경에서 네이티브 NumericSpinner를 올바른 prop(`number`, `onNumberChange`, `minNumber`, `maxNumber`, `disable`)으로 호출
+  - 비-Toss 환경: 커스텀 HTML 버튼 폴백 유지
+
+- 2026-02-19: 안드로이드 폰트 크기 & 버튼 텍스트 조정
+  - `index.css`: `-webkit-text-size-adjust: 100%` 추가 (안드로이드 WV 텍스트 자동 확대 방지)
+  - 버튼 폰트 사이즈 1px씩 축소 (16→15 CTA, 15→14 쌍 버튼, 14→13 보조 버튼)
+
+- 2026-02-19: 토스 미니앱 출시 체크리스트 대응
+  - **광고 사전 로딩**: `src/utils/adPreloader.ts` 신규 모듈. Analyzing에서 API 성공 후 광고 사전 load → AdGate에서 show만 호출
+  - **제스처 확대/축소 비활성화**: `index.html` viewport에 `user-scalable=no, maximum-scale=1.0` 추가
+  - **내비게이션 바 중복 확인**: TDS 경로에서 자체 헤더/뒤로가기 없음 → 토스 내비바와 중복 없음 확인
+  - **데이터 영속성**: `recentComparisons.ts` sessionStorage → localStorage 변경 (앱 종료 후 재진입 시 유지)

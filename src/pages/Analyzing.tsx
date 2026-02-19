@@ -10,6 +10,7 @@ import { useCompareWithImage } from "../hooks/usePriceCompare";
 import { usePriceStore } from "../store/priceStore";
 import { isTossEnvironment } from "../utils/env";
 import { useTDS } from "../utils/tds";
+import { preloadAd } from "../utils/adPreloader";
 
 function Analyzing() {
   const navigate = useNavigate();
@@ -49,22 +50,24 @@ function Analyzing() {
     console.log("[Analyzing] API 호출 시작");
 
     compareWithImage(pendingFile)
-      .then((data) => {
+      .then(async (data) => {
         console.log("[Analyzing] 성공! data:", data);
         clearInterval(interval);
         isNavigatingRef.current = true;
-
-        const targetUrl = isTossEnvironment()
-          ? `/ad-gate/${data.imageId}`
-          : `/price-confirm/${data.imageId}`;
-        console.log("[Analyzing] 네비게이션 시작:", targetUrl);
 
         setImageId(data.imageId);
         setCompareResult(data);
         setPendingFile(null);
 
-        console.log("[Analyzing] store 업데이트 완료, navigate 호출");
-        navigate(targetUrl);
+        if (isTossEnvironment()) {
+          setStatusText("광고를 준비하는 중...");
+          console.log("[Analyzing] 광고 사전 로딩 시작");
+          await preloadAd();
+          console.log("[Analyzing] 광고 사전 로딩 완료, AdGate로 이동");
+          navigate(`/ad-gate/${data.imageId}`);
+        } else {
+          navigate(`/price-confirm/${data.imageId}`);
+        }
       })
       .catch((err) => {
         console.log("[Analyzing] 실패:", err);

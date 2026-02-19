@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { usePriceStore } from "../store/priceStore";
 import { isTossEnvironment } from "../utils/env";
 import { useTDS } from "../utils/tds";
+import { getAdPreloadState, getAdGroupId, preloadAd, resetAdPreload } from "../utils/adPreloader";
 
 type AdState = "prompt" | "loading" | "showing" | "done" | "failed";
 
@@ -73,8 +74,6 @@ function AdFailedView({ imageId, navigate, errorMsg, tds, colors }: { imageId: s
   );
 }
 
-const TEST_AD_GROUP_ID = "ait-ad-test-interstitial-id";
-
 function AdGate() {
   const { imageId } = useParams<{ imageId: string }>();
   const navigate = useNavigate();
@@ -96,80 +95,39 @@ function AdGate() {
     }
   }, [imageId]);
 
-  const handleWatchAd = async () => {
-    if (!isTossEnvironment()) {
-      navigate(`/price-confirm/${imageId}`, { replace: true });
-      return;
-    }
-
-    setAdState("loading");
-    setAdError("");
-
+  const showAdNow = async () => {
     try {
       const { GoogleAdMob } = await import("@apps-in-toss/web-framework");
 
-      try {
-        const loaded = await GoogleAdMob.isAppsInTossAdMobLoaded({ adGroupId: TEST_AD_GROUP_ID });
-        console.log("[AdGate] isAppsInTossAdMobLoaded:", loaded);
-      } catch (checkErr) {
-        console.log("[AdGate] isAppsInTossAdMobLoaded check failed (proceeding anyway):", checkErr);
-      }
+      setAdState("showing");
 
-      const showAd = () => {
-        setAdState("showing");
-
-        GoogleAdMob.showAppsInTossAdMob({
-          options: {
-            adGroupId: TEST_AD_GROUP_ID,
-          },
-          onEvent: (event: any) => {
-            console.log("[AdGate] show event:", event.type);
-            switch (event.type) {
-              case "show":
-                break;
-              case "impression":
-                break;
-              case "clicked":
-                break;
-              case "dismissed":
-                setAdState("done");
-                navigate(`/price-confirm/${imageId}`, { replace: true });
-                break;
-              case "failedToShow":
-                console.error("[AdGate] failedToShow:", JSON.stringify(event));
-                setAdError("광고 표시 실패: " + (event.data?.message || event.type));
-                setAdState("failed");
-                break;
-            }
-          },
-          onError: (error: any) => {
-            console.error("[AdGate] show onError:", JSON.stringify(error));
-            setAdError("show 에러: " + (error?.message || String(error)));
-            setAdState("failed");
-          },
-        });
-      };
-
-      const loadCleanup = GoogleAdMob.loadAppsInTossAdMob({
-        options: {
-          adGroupId: TEST_AD_GROUP_ID,
-        },
+      GoogleAdMob.showAppsInTossAdMob({
+        options: { adGroupId: getAdGroupId() },
         onEvent: (event: any) => {
-          console.log("[AdGate] load event:", event.type, JSON.stringify(event.data || {}));
+          console.log("[AdGate] show event:", event.type);
           switch (event.type) {
-            case "loaded":
-              console.log("[AdGate] 광고 로드 성공");
-              loadCleanup();
-              showAd();
+            case "show":
+            case "impression":
+            case "clicked":
+              break;
+            case "dismissed":
+              setAdState("done");
+              resetAdPreload();
+              navigate(`/price-confirm/${imageId}`, { replace: true });
+              break;
+            case "failedToShow":
+              console.error("[AdGate] failedToShow:", JSON.stringify(event));
+              setAdError("광고 표시 실패: " + (event.data?.message || event.type));
+              setAdState("failed");
+              resetAdPreload();
               break;
           }
         },
         onError: (error: any) => {
-          console.error("[AdGate] load onError:", JSON.stringify(error));
-          const msg = error?.message || error?.code || String(error);
-          setAdError("load 에러: " + msg);
-          loadCleanup();
+          console.error("[AdGate] show onError:", JSON.stringify(error));
+          setAdError("show 에러: " + (error?.message || String(error)));
           setAdState("failed");
+          resetAdPreload();
         },
       });
     } catch (error: any) {
@@ -177,6 +135,55 @@ function AdGate() {
       setAdError("SDK 로드 실패: " + (error?.message || String(error)));
       setAdState("failed");
     }
+  };
+
+  const handleWatchAd = async () => {
+    if (!isTossEnvironment()) {
+      navigate(`/price-confirm/${imageId}`, { replace: true });
+      return;
+    }
+
+    setAdError("");
+    const preloadStatus = getAdPreloadState();
+    console.log("[AdGate] preload status:", preloadStatus);
+
+    if (preloadStatus === "loaded") {
+      await showAdNow();
+      return;
+    }
+
+    setAdState("loading");
+
+    if (preloadStatus === "failed" || preloadStatus === "idle") {
+      const success = await preloadAd();
+      if (success) {
+        await showAdNow();
+      } else {
+        setAdError("광고를 불러오지 못했어요");
+        setAdState("failed");
+      }
+      return;
+    }
+
+    const checkInterval = setInterval(async () => {
+      const state = getAdPreloadState();
+      if (state === "loaded") {
+        clearInterval(checkInterval);
+        await showAdNow();
+      } else if (state === "failed") {
+        clearInterval(checkInterval);
+        setAdError("광고를 불러오지 못했어요");
+        setAdState("failed");
+      }
+    }, 200);
+
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      if (getAdPreloadState() !== "loaded") {
+        setAdError("광고 로딩 시간 초과");
+        setAdState("failed");
+      }
+    }, 15000);
   };
 
   if (!compareResult || !imageId) {
