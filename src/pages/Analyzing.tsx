@@ -8,7 +8,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompareWithImage } from "../hooks/usePriceCompare";
 import { usePriceStore } from "../store/priceStore";
-import { TDSLoader, TDSButton } from "../components/tds";
+import { TDSButton } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
 
 function Analyzing() {
@@ -102,6 +102,170 @@ function Analyzing() {
 
   if (!pendingFile && !localError) {
     return null;
+  }
+
+  const isToss = isTossEnvironment();
+
+  if (isToss) {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#FFFFFF" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "16px 20px",
+            borderBottom: "1px solid #F2F4F6",
+          }}
+        >
+          <h1 style={{ fontSize: 17, fontWeight: 600, margin: 0, color: "#191F28" }}>분석 중</h1>
+          <button
+            onClick={handleClose}
+            style={{
+              background: "transparent",
+              border: "none",
+              fontSize: 20,
+              cursor: "pointer",
+              color: "#8B95A1",
+              padding: 4,
+              width: 32,
+              height: 32,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            aria-label="닫기"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "60vh",
+            gap: 24,
+            padding: "40px 20px",
+          }}
+        >
+          {localError ? (
+            <>
+              <div
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: "50%",
+                  backgroundColor: "#F2F4F6",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8B95A1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "#191F28" }}>
+                  분석에 실패했어요
+                </div>
+                <div style={{ fontSize: 14, color: "#8B95A1", marginBottom: 28, lineHeight: 1.8 }}>
+                  {isRateLimited ? (
+                    <>
+                      요청이 많아 잠시 쉬어가야 해요
+                      <br />
+                      30초 정도 후에 다시 시도해주세요
+                    </>
+                  ) : (
+                    localError.message || "상품 분석에 실패했어요. 다시 시도해주세요."
+                  )}
+                </div>
+                <TDSButton
+                  onClick={() => {
+                    setPendingFile(null);
+                    navigate("/?open=1");
+                  }}
+                  color="primary"
+                  variant="fill"
+                  size="large"
+                >
+                  다시 촬영하기
+                </TDSButton>
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    border: "3px solid #E5E8EB",
+                    borderTopColor: "#3182F6",
+                    animation: "tds-analyzing-spin 1s linear infinite",
+                  }}
+                />
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#191F28", marginBottom: 8 }}>
+                  AI가 상품을 분석하고 있어요
+                </div>
+                <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: 1.6 }}>
+                  {statusText}
+                </div>
+              </div>
+              <div
+                style={{
+                  marginTop: 16,
+                  display: "flex",
+                  gap: 6,
+                  alignItems: "center",
+                }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      backgroundColor: "#3182F6",
+                      animation: `tds-analyzing-bounce 1.4s infinite ease-in-out`,
+                      animationDelay: `${i * 0.16}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <style>{`
+          @keyframes tds-analyzing-spin {
+            to { transform: rotate(360deg); }
+          }
+          @keyframes tds-analyzing-bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   return (
@@ -201,87 +365,64 @@ function Analyzing() {
                   localError.message || "상품 분석에 실패했습니다."
                 )}
               </div>
-              {isTossEnvironment() ? (
-                <TDSButton
-                  onClick={() => {
-                    setPendingFile(null);
-                    navigate("/?open=1");
-                  }}
-                  color="primary"
-                  variant="fill"
-                  size="large"
-                >
-                  다시 분석하기
-                </TDSButton>
-              ) : (
-                <button
-                  onClick={() => {
-                    setPendingFile(null);
-                    navigate("/?open=1");
-                  }}
-                  style={{
-                    padding: "14px 40px",
-                    borderRadius: 12,
-                    border: "none",
-                    backgroundColor: "#1f2937",
-                    color: "#ffffff",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  다시 분석하기
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setPendingFile(null);
+                  navigate("/?open=1");
+                }}
+                style={{
+                  padding: "14px 40px",
+                  borderRadius: 12,
+                  border: "none",
+                  backgroundColor: "#1f2937",
+                  color: "#ffffff",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                다시 분석하기
+              </button>
             </div>
           </>
         ) : (
           <>
-            {isTossEnvironment() ? (
-              <TDSLoader
-                size="large"
-                label={`AI가 상품을 분석하고 있습니다\n${statusText}`}
+            <div
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: "50%",
+                backgroundColor: "var(--card)",
+                border: "2px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                  border: "3px solid transparent",
+                  borderTopColor: "var(--primary)",
+                  animation: "spin 1.2s linear infinite",
+                }}
               />
-            ) : (
-              <>
-                <div
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "50%",
-                    backgroundColor: "var(--card)",
-                    border: "2px solid var(--border)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: "50%",
-                      border: "3px solid transparent",
-                      borderTopColor: "var(--primary)",
-                      animation: "spin 1.2s linear infinite",
-                    }}
-                  />
-                  <span style={{ fontSize: 32 }}>🔍</span>
-                </div>
-                <div style={{ textAlign: "center" }}>
-                  <div
-                    style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}
-                  >
-                    AI가 상품을 분석하고 있습니다
-                  </div>
-                  <div style={{ fontSize: 14, color: "var(--muted)" }}>
-                    {statusText}
-                  </div>
-                </div>
-              </>
-            )}
+              <span style={{ fontSize: 32 }}>🔍</span>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div
+                style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}
+              >
+                AI가 상품을 분석하고 있습니다
+              </div>
+              <div style={{ fontSize: 14, color: "var(--muted)" }}>
+                {statusText}
+              </div>
+            </div>
           </>
         )}
       </div>

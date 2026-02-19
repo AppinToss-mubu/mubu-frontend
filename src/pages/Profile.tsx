@@ -14,7 +14,7 @@ export default function Profile() {
 
   if (isToss) {
     return (
-      <div style={{ padding: 20 }}>
+      <div>
         <h1
           style={{
             fontSize: 24,
@@ -31,11 +31,14 @@ export default function Profile() {
 
         <div
           style={{
-            padding: 40,
+            padding: "40px 24px",
             borderRadius: 16,
             backgroundColor: "#FFFFFF",
             border: "1px solid #F2F4F6",
             textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           <div
@@ -48,7 +51,7 @@ export default function Profile() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 20px",
+              marginBottom: 20,
             }}
           >
             <svg
@@ -81,6 +84,7 @@ export default function Profile() {
               color: "#8B95A1",
               marginBottom: 24,
               lineHeight: 1.6,
+              margin: "0 0 24px 0",
             }}
           >
             지금은 로그인 없이 사용할 수 있어요
@@ -88,9 +92,10 @@ export default function Profile() {
           </p>
           <TDSButton
             onClick={() => navigate("/")}
-            color="dark"
+            color="primary"
             variant="fill"
             size="large"
+            display="full"
           >
             홈으로 돌아가기
           </TDSButton>

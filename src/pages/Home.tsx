@@ -19,7 +19,7 @@ function Home() {
   const { setPendingFile, reset } = usePriceStore();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { items: recent } = useRecentComparisons();
-  const { isAvailable: isTossAvailable, openCamera } = useToss();
+  const { isAvailable: isTossAvailable, openCamera, fetchAlbumPhotos } = useToss();
 
   // 디버깅: Toss 환경 감지 확인
   useEffect(() => {
@@ -78,8 +78,15 @@ function Home() {
     e.target.value = "";
   };
 
-  const openAlbum = () => {
+  const openAlbum = async () => {
     setIsSheetOpen(false);
+
+    if (isTossAvailable) {
+      const file = await fetchAlbumPhotos();
+      if (file) handleFileSelect(file);
+      return;
+    }
+
     albumInputRef.current?.click();
   };
 
