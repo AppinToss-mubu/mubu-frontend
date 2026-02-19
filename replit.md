@@ -122,9 +122,18 @@ npm run dev
   - `docs/mubu-ad-strategy.md` - MUBU 광고 전략 (광고+제휴 커머스 수익 모델)
   - `src/pages/AdGate.tsx` - 전면 광고 게이트 페이지 (Toss 전용)
     - 매 비교마다 광고 시청 → 결과 확인 (횟수 제한/구독 없음)
-    - TDSConfirmDialog로 광고 시청 안내
-    - @cursor-todo: 실제 SDK 호출 연결 필요
+    - @cursor-todo: simulateAdFlow() → GoogleAdMob SDK 호출로 교체
   - `src/components/AdBannerSlot.tsx` - 배너 광고 슬롯 (Result 페이지 하단, Toss 전용)
   - 라우팅: Analyzing → AdGate(Toss) 또는 PriceConfirm(웹) 환경 분기
-  - PriceConfirm: 쿠팡 출처 표시 축소 (12px, opacity 0.6)
   - 수익 모델: 전면 광고 + 배너 광고 + 쿠팡 파트너스 (유료 구독 없음)
+
+- 2026-02-19: AdGate UI 리디자인 + Cursor 인수인계 문서 갱신
+  - AdGate: TDSConfirmDialog → 풀스크린 안내 화면으로 변경
+    - 체크 아이콘 + 안내 텍스트 + 피처 카드 2개 (광고 시청 / 결과 확인)
+    - 로딩/재생중/실패 상태별 전용 UI
+    - 하단 CTA 버튼 + "다음에 할게요" 텍스트 버튼
+  - `docs/cursor-handoff.md` 갱신:
+    - 테스트 광고 ID (ait-ad-test-interstitial-id, ait-ad-test-rewarded-id)
+    - 카메라/앨범 SDK 이미 useToss.ts에 구현 완료 확인
+    - `npm install @apps-in-toss/web-framework` 후 바로 동작
+    - 작업 체크리스트 + 유저 플로우 정리
