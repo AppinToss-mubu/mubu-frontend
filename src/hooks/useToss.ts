@@ -13,7 +13,10 @@ import { isTossEnvironment } from "../utils/env";
  * dataUri(base64)를 File 객체로 변환하는 헬퍼 함수
  * Toss SDK openCamera/fetchAlbumPhotos 응답: { id, dataUri }
  */
-const dataUriToFile = (dataUri: string, fileName: string = "image.jpg"): File => {
+const dataUriToFile = (
+  dataUri: string,
+  fileName: string = "image.jpg"
+): File => {
   const base64Data = dataUri.replace(/^data:image\/\w+;base64,/, "");
   const byteCharacters = atob(base64Data);
   const byteNumbers = new Array(byteCharacters.length);
@@ -52,10 +55,16 @@ export const useToss = () => {
       return dataUriToFile(imageUri, `camera_${response.id || Date.now()}.jpg`);
     } catch (error: any) {
       try {
-        const { OpenCameraPermissionError } = await import("@apps-in-toss/web-framework");
+        const { OpenCameraPermissionError } = await import(
+          "@apps-in-toss/web-framework"
+        );
         if (error instanceof OpenCameraPermissionError) {
-          console.warn("카메라 권한이 거부되었습니다. 설정에서 권한을 허용해주세요.");
-          alert("카메라 권한이 필요해요. 토스 앱 설정에서 카메라 권한을 허용해주세요.");
+          console.warn(
+            "카메라 권한이 거부되었습니다. 설정에서 권한을 허용해주세요."
+          );
+          alert(
+            "카메라 권한이 필요해요. 토스 앱 설정에서 카메라 권한을 허용해주세요."
+          );
           return null;
         }
       } catch {
@@ -100,10 +109,16 @@ export const useToss = () => {
       return dataUriToFile(imageUri, `album_${photo.id || Date.now()}.jpg`);
     } catch (error: any) {
       try {
-        const { FetchAlbumPhotosPermissionError } = await import("@apps-in-toss/web-framework");
+        const { FetchAlbumPhotosPermissionError } = await import(
+          "@apps-in-toss/web-framework"
+        );
         if (error instanceof FetchAlbumPhotosPermissionError) {
-          console.warn("사진첩 권한이 거부되었습니다. 설정에서 권한을 허용해주세요.");
-          alert("사진첩 권한이 필요해요. 토스 앱 설정에서 사진첩 권한을 허용해주세요.");
+          console.warn(
+            "사진첩 권한이 거부되었습니다. 설정에서 권한을 허용해주세요."
+          );
+          alert(
+            "사진첩 권한이 필요해요. 토스 앱 설정에서 사진첩 권한을 허용해주세요."
+          );
           return null;
         }
       } catch {
