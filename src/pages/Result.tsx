@@ -115,7 +115,7 @@ function Result() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { Text, Top, Button, Asset } = tds;
+    const { Text, Button, Asset } = tds;
     const { adaptive } = colors;
 
     return (

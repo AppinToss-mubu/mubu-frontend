@@ -119,7 +119,7 @@ function PriceConfirm() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { Text, Button, BottomSheet, TextField, Asset } = tds;
+    const { Text, Button, BottomSheet, TextField } = tds;
     const { adaptive } = colors;
     return (
       <div style={{
