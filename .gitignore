@@ -63,3 +63,6 @@ attached_assets/
 
 # Toss App Bundle files
 *.ait
+
+# Claude Code worktrees
+.claude/worktrees/
