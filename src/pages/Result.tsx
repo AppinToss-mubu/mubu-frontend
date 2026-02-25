@@ -115,25 +115,24 @@ function Result() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { ListRow, Top, Button, Asset } = tds;
+    const { Text, Top, Button, Asset } = tds;
     const { adaptive } = colors;
 
     return (
       <div style={{ paddingBottom: 100 }}>
-        <ListRow
-          contents={
-            <ListRow.Texts
-              type="2RowTypeA"
-              top={compareResult.productName}
-              topProps={{ color: adaptive.grey800, fontWeight: "bold" }}
-              bottom={`출처: ${hasKoreaPrice ? compareResult.mallName : "한국 가격 정보 없음"}`}
-              bottomProps={{ color: adaptive.grey600 }}
-            />
-          }
-          verticalPadding="large"
-        />
+        {/* Product info header */}
+        <div style={{ padding: "24px 20px 0" }}>
+          <Text display="block" color={adaptive.grey900} typography="t3" fontWeight="bold">
+            {compareResult.productName}
+          </Text>
+          <div style={{ height: 4 }} />
+          <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
+            출처: {hasKoreaPrice ? compareResult.mallName : "한국 가격 정보 없음"}
+          </Text>
+        </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 20px" }}>
+        {/* Quantity spinner */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 20px 16px" }}>
           <TDSNumericSpinner
             value={quantity}
             onChange={setQuantity}
@@ -143,41 +142,102 @@ function Result() {
           />
         </div>
 
+        {/* Price cards - unit prices */}
         <div style={{ padding: "0 20px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-            <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-down-mono" color={adaptive.blue500} aria-hidden={true} />
-              <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>현지단가</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "#191F28" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+            <div style={{
+              padding: "20px 16px",
+              borderRadius: 20,
+              backgroundColor: "#F2F4F6",
+              textAlign: "center",
+            }}>
+              <div style={{
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                backgroundColor: "#E8F3FF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 10px",
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#3182F6" opacity="0.15"/>
+                  <path d="M12 6v12M8 10l4-4 4 4" stroke="#3182F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
+                현지 단가
+              </Text>
+              <div style={{ height: 4 }} />
+              <Text display="block" color={adaptive.grey900} typography="t4" fontWeight="bold">
                 {localUnitPrice.toLocaleString()}{currencySymbol}
-              </div>
+              </Text>
             </div>
-            <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-up-mono" color={adaptive.blue500} aria-hidden={true} />
-              <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>한국단가</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "#191F28" }}>
-                {hasKoreaPrice ? `₩${formatCurrency(koreaUnitPrice)}` : "₩0"}
+            <div style={{
+              padding: "20px 16px",
+              borderRadius: 20,
+              backgroundColor: "#F2F4F6",
+              textAlign: "center",
+            }}>
+              <div style={{
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                backgroundColor: "#FFF0F0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 10px",
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#F04452" opacity="0.15"/>
+                  <path d="M8 12h8M12 8v8" stroke="#F04452" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
+              <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
+                한국 단가
+              </Text>
+              <div style={{ height: 4 }} />
+              <Text display="block" color={adaptive.grey900} typography="t4" fontWeight="bold">
+                {hasKoreaPrice ? `₩${formatCurrency(koreaUnitPrice)}` : "₩0"}
+              </Text>
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-down-mono" color={adaptive.blue500} aria-hidden={true} />
-              <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>현지총액</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#191F28" }}>
+          {/* Total prices */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div style={{
+              padding: "20px 16px",
+              borderRadius: 20,
+              backgroundColor: "#F2F4F6",
+              textAlign: "center",
+            }}>
+              <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
+                현지 총액
+              </Text>
+              <div style={{ height: 4 }} />
+              <Text display="block" color={adaptive.grey900} typography="t5" fontWeight="bold">
                 {localTotal.toLocaleString()}{currencySymbol}
-              </div>
-              <div style={{ fontSize: 12, color: "#B0B8C1", marginTop: 4 }}>
+              </Text>
+              <div style={{ height: 2 }} />
+              <Text display="block" color={adaptive.grey400} typography="t7" fontWeight="regular">
                 ₩{formatCurrency(localTotalKrw)}
-              </div>
+              </Text>
             </div>
-            <div style={{ padding: 16, borderRadius: 12, backgroundColor: "#F9FAFB", textAlign: "center" }}>
-              <Asset.Icon frameShape={Asset.frameShape.CleanW24} name="icon-arrow-up-mono" color={adaptive.blue500} aria-hidden={true} />
-              <div style={{ fontSize: 12, color: "#8B95A1", marginBottom: 6, marginTop: 4 }}>한국총액</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#191F28" }}>
+            <div style={{
+              padding: "20px 16px",
+              borderRadius: 20,
+              backgroundColor: "#F2F4F6",
+              textAlign: "center",
+            }}>
+              <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
+                한국 총액
+              </Text>
+              <div style={{ height: 4 }} />
+              <Text display="block" color={adaptive.grey900} typography="t5" fontWeight="bold">
                 {hasKoreaPrice ? `₩${formatCurrency(koreaTotal)}` : "₩0"}
-              </div>
+              </Text>
             </div>
           </div>
         </div>
@@ -186,7 +246,7 @@ function Result() {
           <div style={{
             margin: "16px 20px 0",
             padding: 16,
-            borderRadius: 12,
+            borderRadius: 20,
             backgroundColor: "#FFEEEE",
             color: "#F04452",
             textAlign: "center",
@@ -198,105 +258,103 @@ function Result() {
 
         {isSummaryLoading ? (
           <div style={{
-            margin: "16px 20px 0",
-            padding: 24,
-            borderRadius: 16,
-            backgroundColor: "#F9FAFB",
+            margin: "20px 20px 0",
+            padding: 28,
+            borderRadius: 20,
+            backgroundColor: "#F2F4F6",
             textAlign: "center",
-            color: "#8B95A1",
-            fontSize: 14,
           }}>
-            계산 중...
+            <Text display="block" color={adaptive.grey400} typography="t6" fontWeight="regular" textAlign="center">
+              계산 중...
+            </Text>
           </div>
         ) : !hasKoreaPrice ? (
           <div style={{
-            margin: "16px 20px 0",
-            padding: 24,
-            borderRadius: 16,
+            margin: "20px 20px 0",
+            padding: 28,
+            borderRadius: 20,
             backgroundColor: "#FFF8E1",
             textAlign: "center",
           }}>
-            <div style={{ fontSize: 24, marginBottom: 12 }}>🔍</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "#191F28", marginBottom: 8, lineHeight: "25.5px" }}>
+            <Asset.Image
+              frameShape={Asset.frameShape.CleanW48}
+              backgroundColor="transparent"
+              src="https://static.toss.im/3d-emojis/u1F50D.png"
+              alt="검색"
+              style={{ aspectRatio: "1/1", margin: "0 auto 12px" }}
+            />
+            <Text display="block" color={adaptive.grey800} typography="t5" fontWeight="semibold" textAlign="center">
               한국에서 구할 수 없을 수도 있어요
-            </div>
-            <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: "21px" }}>
-              이 상품은 한국에서 판매되지 않거나<br />정확히 일치하는 상품을 찾지 못했어요
-            </div>
+            </Text>
+            <div style={{ height: 6 }} />
+            <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular" textAlign="center">
+              이 상품은 한국에서 판매되지 않거나{"\n"}정확히 일치하는 상품을 찾지 못했어요
+            </Text>
           </div>
         ) : (
-          <div style={{ padding: "24px 20px 0" }}>
-            <Top
-              subtitleTop={
-                <Top.SubtitleParagraph size={13}>총 절약</Top.SubtitleParagraph>
-              }
-              title={
-                <Top.TitleParagraph size={28}>
-                  {savedTotal >= 0 ? "+" : "-"} {Math.abs(savedTotal).toLocaleString()}원
-                </Top.TitleParagraph>
-              }
-              subtitleBottom={
-                <Top.SubtitleParagraph size={13}>
-                  {savedTotal > 0
-                    ? "현지에서 사는 것이 더 저렴해요"
-                    : savedTotal < 0
-                      ? "한국에서 사는 것이 더 저렴해요"
-                      : "한국과 현지 가격이 동일해요"}
-                </Top.SubtitleParagraph>
-              }
-              lower={
-                <Top.LowerCTA
-                  type="2-button"
-                  leftButton={
-                    <Top.LowerCTAButton
-                      color="dark"
-                      variant="weak"
-                      display="block"
-                      onClick={handleViewKoreaPrice}
-                      disabled={!externalLinkUrl}
-                    >
-                      한국가격 보기
-                    </Top.LowerCTAButton>
-                  }
-                  rightButton={
-                    <Top.LowerCTAButton
-                      display="block"
-                      onClick={handlePurchase}
-                    >
-                      구매함
-                    </Top.LowerCTAButton>
-                  }
-                />
-              }
-            />
+          <div style={{
+            margin: "20px 20px 0",
+            padding: "28px 20px",
+            borderRadius: 20,
+            backgroundColor: savedTotal > 0 ? "#EBF5FF" : savedTotal < 0 ? "#E8FAF0" : "#F2F4F6",
+            textAlign: "center",
+          }}>
+            <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular" textAlign="center">
+              총 절약
+            </Text>
+            <div style={{ height: 6 }} />
+            <Text
+              display="block"
+              color={savedTotal > 0 ? "#3182F6" : savedTotal < 0 ? "#26B96B" : adaptive.grey900}
+              typography="t1"
+              fontWeight="bold"
+              textAlign="center"
+            >
+              {savedTotal >= 0 ? "+" : "-"}{Math.abs(savedTotal).toLocaleString()}원
+            </Text>
+            <div style={{ height: 8 }} />
+            <Text display="block" color={adaptive.grey600} typography="t7" fontWeight="regular" textAlign="center">
+              {savedTotal > 0
+                ? "현지에서 사는 것이 더 저렴해요"
+                : savedTotal < 0
+                  ? "한국에서 사는 것이 더 저렴해요"
+                  : "한국과 현지 가격이 동일해요"}
+            </Text>
           </div>
         )}
 
-        {!hasKoreaPrice && (
-          <div style={{ padding: "16px 20px 0" }}>
+        {/* Action buttons */}
+        <div style={{ padding: "20px 20px 0" }}>
+          {hasKoreaPrice ? (
+            <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <Button color="dark" variant="weak" display="block" onClick={handleViewKoreaPrice} disabled={!externalLinkUrl}>
+                  한국가격 보기
+                </Button>
+              </div>
+              <div style={{ flex: 1 }}>
+                <Button display="block" onClick={handlePurchase}>
+                  구매함
+                </Button>
+              </div>
+            </div>
+          ) : (
             <Button display="block" onClick={() => navigate("/")}>
               다른 상품 비교하기
             </Button>
-          </div>
-        )}
+          )}
+        </div>
 
         <AdBannerSlot placement="result-bottom" />
 
         <div style={{
-          marginTop: 16,
-          padding: 16,
-          fontSize: 11,
-          color: "#B0B8C1",
+          marginTop: 20,
+          padding: "0 20px",
           textAlign: "center",
-          lineHeight: 1.6,
         }}>
-          <p style={{ margin: 0, marginBottom: 4 }}>
-            ⓘ 해당 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다
-          </p>
-          <p style={{ margin: 0 }}>
-            ※ 가격 및 환율은 실시간 변동 가능하며, 동일 모델/옵션 기준으로
-            비교되었습니다
-          </p>
+          <Text display="block" color={adaptive.grey300} typography="t7" fontWeight="regular" textAlign="center">
+            가격 및 환율은 실시간 변동 가능하며,{"\n"}동일 모델/옵션 기준으로 비교되었습니다
+          </Text>
         </div>
       </div>
     );

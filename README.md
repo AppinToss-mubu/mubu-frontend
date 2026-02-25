@@ -1,73 +1,46 @@
-# React + TypeScript + Vite
+# MUBU (무부) - 해외 가격 비교 서비스
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+해외 여행 중 발견한 상품을 촬영하면, AI가 한국 가격과 비교해주는 서비스입니다.
 
-Currently, two official plugins are available:
+## 주요 기능
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 상품 사진 촬영/업로드로 AI 가격 분석
+- 현지 가격 vs 한국 가격 실시간 비교
+- 다양한 통화 지원 (THB, JPY, USD, EUR 등 12종)
+- 최근 비교 기록 관리
 
-## React Compiler
+## 기술 스택
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **프레임워크**: React 18 + TypeScript + Vite
+- **상태 관리**: Zustand, React Query
+- **라우팅**: React Router v7
+- **UI**: Toss Design System (TDS Mobile v2)
+- **배포**: 토스 앱인토스 미니앱 + 웹 환경 동시 지원
 
-## Expanding the ESLint configuration
+## 실행 방법
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 의존성 설치
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# 웹 개발 서버
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# 토스 시뮬레이터 개발 서버
+npm run dev:toss
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 빌드
+npm run build          # 웹
+npm run build:toss     # 토스 미니앱 (.ait)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 프로젝트 구조
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+  pages/        # 페이지 컴포넌트 (Home, Result, PriceConfirm 등)
+  components/   # 공통 컴포넌트 (AppShell, TDS 래퍼 등)
+  hooks/        # 커스텀 훅 (useToss, useRecentComparisons 등)
+  store/        # Zustand 스토어
+  utils/        # 유틸리티 (환경 감지, TDS 로더, 광고 등)
 ```

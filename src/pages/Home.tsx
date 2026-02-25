@@ -129,91 +129,148 @@ function Home() {
   );
 
   if (isToss && tdsReady) {
-    const { Top, Button, ListHeader, ListFooter } = tds;
+    const { Text, Button } = tds;
     const { adaptive } = colors;
     return (
-      <div>
-        <Top
-          title={
-            <Top.TitleParagraph size={28} color={adaptive.grey900}>
-              여행자님
-            </Top.TitleParagraph>
-          }
-          subtitleTop={<Top.SubtitleParagraph>안녕하세요</Top.SubtitleParagraph>}
-          subtitleBottom={
-            <Top.SubtitleParagraph>
-              해외에서 발견한 상품, 한국 가격과 비교해보세요
-            </Top.SubtitleParagraph>
-          }
-        />
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", paddingBottom: 100 }}>
+        {/* Hero section - centered upper */}
+        <div style={{
+          flex: "0 0 auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px 24px 32px",
+          textAlign: "center",
+        }}>
+          <Text display="block" color={adaptive.grey500} typography="t6" fontWeight="regular">
+            안녕하세요
+          </Text>
+          <div style={{ height: 6 }} />
+          <Text display="block" color={adaptive.grey900} typography="t1" fontWeight="bold">
+            여행자님
+          </Text>
+          <div style={{ height: 10 }} />
+          <Text display="block" color={adaptive.grey600} typography="t6" fontWeight="regular" textAlign="center">
+            해외에서 발견한 상품, 한국 가격과 비교해보세요
+          </Text>
 
-        <div style={{ padding: "0 20px" }}>
-          <Button display="block" onClick={() => setIsSheetOpen(true)}>
-            상품 촬영하기
-          </Button>
+          <div style={{ height: 28 }} />
+          <div style={{ width: "100%", padding: "0 4px" }}>
+            <Button display="block" onClick={() => setIsSheetOpen(true)}>
+              상품 촬영하기
+            </Button>
+          </div>
         </div>
 
         {hiddenInputs}
 
         {localError && (
-          <div
-            style={{
-              margin: "16px 20px 0",
-              padding: 12,
-              borderRadius: 12,
-              backgroundColor: "#FFEEEE",
-              color: "#F04452",
-              fontSize: 14,
-              lineHeight: "21px",
-            }}
-          >
+          <div style={{
+            margin: "0 20px 16px",
+            padding: 14,
+            borderRadius: 16,
+            backgroundColor: "#FFEEEE",
+            color: "#F04452",
+            fontSize: 14,
+            lineHeight: "21px",
+            textAlign: "center",
+          }}>
             {localError}
           </div>
         )}
 
-        <Top
-          title={
-            <Top.TitleTextButton
-              size="xlarge"
-              color={adaptive.grey900}
-              onClick={() => navigate("/dashboard")}
-            >
-              최근비교
-            </Top.TitleTextButton>
-          }
-        />
-
-        {recent.length === 0 ? (
-          <div style={{ color: "#8B95A1", padding: "8px 20px", fontSize: 14, lineHeight: "21px" }}>
-            아직 비교한 기록이 없어요.
+        {/* Recent comparisons section */}
+        <div style={{ flex: 1, padding: "0 20px" }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 16,
+          }}>
+            <Text display="block" color={adaptive.grey900} typography="t5" fontWeight="bold">
+              최근 비교
+            </Text>
+            {recent.length > 0 && (
+              <button
+                onClick={() => navigate("/dashboard")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  color: "#8B95A1",
+                  fontSize: 13,
+                  fontWeight: 500,
+                }}
+              >
+                더보기
+              </button>
+            )}
           </div>
-        ) : (
-          <>
-            {recent.slice(0, 3).map((r) => (
-              <ListHeader
-                key={r.id}
-                title={
-                  <ListHeader.TitleParagraph color={adaptive.grey800} typography="t5" fontWeight="semibold">
-                    {r.productName}
-                  </ListHeader.TitleParagraph>
-                }
-                right={
-                  <ListHeader.RightArrow color={adaptive.grey400} typography="t7">
-                    {r.savedAmount >= 0 ? "+" : "-"}
-                    {new Intl.NumberFormat("ko-KR").format(Math.abs(r.savedAmount))}원
-                  </ListHeader.RightArrow>
-                }
-                onClick={() => navigate(`/result/${r.id}`)}
-              />
-            ))}
-            <ListFooter
-              onClick={() => navigate("/dashboard")}
-              aria-label="더 많은 비교 보기"
-            >
-              더 보기
-            </ListFooter>
-          </>
-        )}
+
+          {recent.length === 0 ? (
+            <div style={{
+              padding: "32px 0",
+              textAlign: "center",
+            }}>
+              <Text display="block" color={adaptive.grey400} typography="t6" fontWeight="regular" textAlign="center">
+                아직 비교한 기록이 없어요
+              </Text>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {recent.slice(0, 3).map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => navigate(`/result/${r.id}`)}
+                  role="button"
+                  tabIndex={0}
+                  style={{
+                    padding: "16px 18px",
+                    borderRadius: 20,
+                    backgroundColor: "#F9FAFB",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    cursor: "pointer",
+                    transition: "background-color 0.15s",
+                  }}
+                >
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <Text display="block" color={adaptive.grey800} typography="t6" fontWeight="semibold">
+                      <span style={{
+                        display: "block",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}>
+                        {r.productName}
+                      </span>
+                    </Text>
+                  </div>
+                  <div style={{
+                    padding: "6px 14px",
+                    borderRadius: 999,
+                    backgroundColor: r.savedAmount >= 0 ? "#EBF5FF" : "#F2F4F6",
+                    flexShrink: 0,
+                  }}>
+                    <Text
+                      display="block"
+                      color={r.savedAmount >= 0 ? "#3182F6" : adaptive.grey500}
+                      typography="t7"
+                      fontWeight="bold"
+                    >
+                      {r.savedAmount >= 0 ? "+" : "-"}
+                      {new Intl.NumberFormat("ko-KR").format(Math.abs(r.savedAmount))}원
+                    </Text>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {sheetComponent}
       </div>
