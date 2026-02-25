@@ -148,26 +148,21 @@ function Result() {
             <div style={{
               padding: "20px 16px",
               borderRadius: 20,
-              backgroundColor: "#F2F4F6",
+              backgroundColor: "#FAFBFC",
+              border: "1px solid #F2F4F6",
               textAlign: "center",
             }}>
-              <div style={{
-                width: 36,
-                height: 36,
-                borderRadius: 12,
-                backgroundColor: "#E8F3FF",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 10px",
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#3182F6" opacity="0.15"/>
-                  <path d="M12 6v12M8 10l4-4 4 4" stroke="#3182F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                <Asset.Icon
+                  frameShape={Asset.frameShape.CircleLarge}
+                  backgroundColor={adaptive.greyOpacity100}
+                  name="icon-money-bag-twinkle"
+                  scale={0.66}
+                  aria-hidden={true}
+                />
               </div>
               <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
-                현지 단가
+                현지단가
               </Text>
               <div style={{ height: 4 }} />
               <Text display="block" color={adaptive.grey900} typography="t4" fontWeight="bold">
@@ -177,26 +172,21 @@ function Result() {
             <div style={{
               padding: "20px 16px",
               borderRadius: 20,
-              backgroundColor: "#F2F4F6",
+              backgroundColor: "#FAFBFC",
+              border: "1px solid #F2F4F6",
               textAlign: "center",
             }}>
-              <div style={{
-                width: 36,
-                height: 36,
-                borderRadius: 12,
-                backgroundColor: "#FFF0F0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 10px",
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#F04452" opacity="0.15"/>
-                  <path d="M8 12h8M12 8v8" stroke="#F04452" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                <Asset.Icon
+                  frameShape={Asset.frameShape.CircleLarge}
+                  backgroundColor={adaptive.greyOpacity100}
+                  name="icon-moneybag-heart-3"
+                  scale={0.66}
+                  aria-hidden={true}
+                />
               </div>
               <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
-                한국 단가
+                한국단가
               </Text>
               <div style={{ height: 4 }} />
               <Text display="block" color={adaptive.grey900} typography="t4" fontWeight="bold">
@@ -210,11 +200,21 @@ function Result() {
             <div style={{
               padding: "20px 16px",
               borderRadius: 20,
-              backgroundColor: "#F2F4F6",
+              backgroundColor: "#FAFBFC",
+              border: "1px solid #F2F4F6",
               textAlign: "center",
             }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                <Asset.Icon
+                  frameShape={Asset.frameShape.CircleLarge}
+                  backgroundColor={adaptive.greyOpacity100}
+                  name="icon-money-bag-twinkle"
+                  scale={0.66}
+                  aria-hidden={true}
+                />
+              </div>
               <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
-                현지 총액
+                현지총액
               </Text>
               <div style={{ height: 4 }} />
               <Text display="block" color={adaptive.grey900} typography="t5" fontWeight="bold">
@@ -228,11 +228,21 @@ function Result() {
             <div style={{
               padding: "20px 16px",
               borderRadius: 20,
-              backgroundColor: "#F2F4F6",
+              backgroundColor: "#FAFBFC",
+              border: "1px solid #F2F4F6",
               textAlign: "center",
             }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                <Asset.Icon
+                  frameShape={Asset.frameShape.CircleLarge}
+                  backgroundColor={adaptive.greyOpacity100}
+                  name="icon-moneybag-heart-3"
+                  scale={0.66}
+                  aria-hidden={true}
+                />
+              </div>
               <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
-                한국 총액
+                한국총액
               </Text>
               <div style={{ height: 4 }} />
               <Text display="block" color={adaptive.grey900} typography="t5" fontWeight="bold">
@@ -293,27 +303,22 @@ function Result() {
           </div>
         ) : (
           <div style={{
-            margin: "20px 20px 0",
-            padding: "28px 20px",
-            borderRadius: 20,
-            backgroundColor: savedTotal > 0 ? "#EBF5FF" : savedTotal < 0 ? "#E8FAF0" : "#F2F4F6",
-            textAlign: "center",
+            margin: "24px 20px 0",
+            padding: "0 4px",
           }}>
-            <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular" textAlign="center">
-              총 절약
-            </Text>
-            <div style={{ height: 6 }} />
             <Text
               display="block"
-              color={savedTotal > 0 ? "#3182F6" : savedTotal < 0 ? "#26B96B" : adaptive.grey900}
+              color={adaptive.grey900}
               typography="t1"
               fontWeight="bold"
-              textAlign="center"
             >
-              {savedTotal >= 0 ? "+" : "-"}{Math.abs(savedTotal).toLocaleString()}원
+              {Math.abs(savedTotal).toLocaleString()}원
             </Text>
-            <div style={{ height: 8 }} />
-            <Text display="block" color={adaptive.grey600} typography="t7" fontWeight="regular" textAlign="center">
+            <div style={{ height: 4 }} />
+            <Text display="block" color={adaptive.grey500} typography="t6" fontWeight="regular">
+              {savedTotal > 0 ? "+" : savedTotal < 0 ? "-" : ""} 총 절약
+            </Text>
+            <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
               {savedTotal > 0
                 ? "현지에서 사는 것이 더 저렴해요"
                 : savedTotal < 0

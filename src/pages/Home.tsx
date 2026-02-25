@@ -133,15 +133,10 @@ function Home() {
     const { adaptive } = colors;
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", paddingBottom: 100 }}>
-        {/* Hero section - centered upper */}
+        {/* Hero section - left aligned */}
         <div style={{
           flex: "0 0 auto",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "48px 24px 32px",
-          textAlign: "center",
+          padding: "32px 20px 0",
         }}>
           <Text display="block" color={adaptive.grey500} typography="t6" fontWeight="regular">
             안녕하세요
@@ -151,17 +146,17 @@ function Home() {
             여행자님
           </Text>
           <div style={{ height: 10 }} />
-          <Text display="block" color={adaptive.grey600} typography="t6" fontWeight="regular" textAlign="center">
+          <Text display="block" color={adaptive.grey600} typography="t6" fontWeight="regular">
             해외에서 발견한 상품, 한국 가격과 비교해보세요
           </Text>
 
-          <div style={{ height: 28 }} />
-          <div style={{ width: "100%", padding: "0 4px" }}>
-            <Button display="block" onClick={() => setIsSheetOpen(true)}>
-              상품 촬영하기
-            </Button>
-          </div>
+          <div style={{ height: 24 }} />
+          <Button display="block" onClick={() => setIsSheetOpen(true)}>
+            상품 촬영하기
+          </Button>
         </div>
+
+        <div style={{ height: 40 }} />
 
         {hiddenInputs}
 
