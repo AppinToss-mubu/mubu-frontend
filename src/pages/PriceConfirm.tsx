@@ -119,7 +119,7 @@ function PriceConfirm() {
   const shouldUseTDS = isToss && tdsReady;
 
   if (shouldUseTDS) {
-    const { Text, Button, BottomSheet, TextField } = tds;
+    const { Text, Button, BottomSheet, TextField, Asset } = tds;
     const { adaptive } = colors;
     return (
       <div style={{
@@ -160,26 +160,21 @@ function PriceConfirm() {
         {!editMode && hasAiPrice && (
           <div style={{ padding: "24px 20px 0" }}>
             <div style={{
-              backgroundColor: "#F2F4F6",
+              backgroundColor: "#FAFBFC",
               borderRadius: 24,
+              border: "1px solid #F2F4F6",
               padding: "32px 24px",
               textAlign: "center",
               marginBottom: 20,
             }}>
-              <div style={{
-                width: 48,
-                height: 48,
-                borderRadius: 16,
-                backgroundColor: "#E8F3FF",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 16px",
-              }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 12l2 2 4-4" stroke="#3182F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="12" r="9" stroke="#3182F6" strokeWidth="2"/>
-                </svg>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+                <Asset.Image
+                  frameShape={Asset.frameShape.Circle2XLarge}
+                  backgroundColor={adaptive.greyOpacity100}
+                  src="https://static.toss.im/2d-emojis/png/4x/u1F937_u1F3FB_u200D_u2640.png"
+                  scale={0.66}
+                  aria-hidden={true}
+                />
               </div>
               <Text display="block" color={adaptive.grey500} typography="t6" fontWeight="regular" textAlign="center">
                 감지된 가격
@@ -214,65 +209,66 @@ function PriceConfirm() {
         {/* Edit mode */}
         {(editMode || !hasAiPrice) && (
           <div style={{ padding: "24px 20px 0" }}>
+            <Text display="block" color={adaptive.grey700} typography="t5" fontWeight="semibold" textAlign="center">
+              {hasAiPrice ? "가격 수정" : "가격을 입력해주세요"}
+            </Text>
+            <div style={{ height: 20 }} />
+
+            {/* Currency selector */}
+            <button
+              onClick={() => setCurrencyMenuOpen(true)}
+              style={{
+                width: "100%",
+                padding: "16px 18px",
+                borderRadius: 20,
+                border: "1px solid #F2F4F6",
+                backgroundColor: "#FAFBFC",
+                fontSize: 15,
+                fontWeight: 500,
+                color: "#191F28",
+                textAlign: "left",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 12,
+              }}
+            >
+              <span>{CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9l6 6 6-6" stroke="#8B95A1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
+            <BottomSheet
+              open={currencyMenuOpen}
+              onClose={() => setCurrencyMenuOpen(false)}
+              header={<BottomSheet.Header>통화를 선택해주세요</BottomSheet.Header>}
+            >
+              <BottomSheet.Select
+                options={CURRENCY_OPTIONS.map((opt) => ({
+                  name: opt.label,
+                  value: opt.value,
+                }))}
+                value={editCurrency}
+                onChange={(e: any) => {
+                  const selected = e.target.value;
+                  if (selected) {
+                    setEditCurrency(selected);
+                    setCurrencyMenuOpen(false);
+                  }
+                }}
+              />
+            </BottomSheet>
+
+            {/* Price input */}
             <div style={{
-              backgroundColor: "#F2F4F6",
-              borderRadius: 24,
-              padding: "28px 20px",
+              borderRadius: 20,
+              border: "1px solid #F2F4F6",
+              backgroundColor: "#FAFBFC",
+              padding: "4px 0",
               marginBottom: 24,
             }}>
-              <Text display="block" color={adaptive.grey700} typography="t5" fontWeight="semibold" textAlign="center">
-                {hasAiPrice ? "가격 수정" : "가격을 입력해주세요"}
-              </Text>
-              <div style={{ height: 20 }} />
-
-              {/* Currency selector */}
-              <button
-                onClick={() => setCurrencyMenuOpen(true)}
-                style={{
-                  width: "100%",
-                  padding: "14px 18px",
-                  borderRadius: 16,
-                  border: "none",
-                  backgroundColor: "#FFFFFF",
-                  fontSize: 15,
-                  fontWeight: 500,
-                  color: "#191F28",
-                  textAlign: "left",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 12,
-                }}
-              >
-                <span>{CURRENCY_OPTIONS.find(o => o.value === editCurrency)?.label || "통화를 선택해주세요"}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9l6 6 6-6" stroke="#8B95A1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-
-              <BottomSheet
-                open={currencyMenuOpen}
-                onClose={() => setCurrencyMenuOpen(false)}
-                header={<BottomSheet.Header>통화를 선택해주세요</BottomSheet.Header>}
-              >
-                <BottomSheet.Select
-                  options={CURRENCY_OPTIONS.map((opt) => ({
-                    name: opt.label,
-                    value: opt.value,
-                  }))}
-                  value={editCurrency}
-                  onChange={(e: any) => {
-                    const selected = e.target.value;
-                    if (selected) {
-                      setEditCurrency(selected);
-                      setCurrencyMenuOpen(false);
-                    }
-                  }}
-                />
-              </BottomSheet>
-
-              {/* Price input */}
               <TextField.Clearable
                 variant="box"
                 hasError={false}
