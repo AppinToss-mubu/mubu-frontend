@@ -1,6 +1,6 @@
 /**
  * TDS 스타일 BottomNav 래퍼
- * - Toss 환경: TDS 스타일 적용
+ * - Toss 환경: 플로팅 형태 탭바 (토스 브랜딩 가이드 준수)
  * - 일반 웹: 기존 스타일 유지
  */
 
@@ -14,36 +14,32 @@ interface TDSBottomNavProps {
     active?: boolean;
     onClick: () => void;
   }[];
-  centerAction?: {
-    icon: React.ReactNode;
-    onClick: () => void;
-    ariaLabel?: string;
-  };
   style?: React.CSSProperties;
   className?: string;
 }
 
 export function TDSBottomNav({
   items,
-  centerAction,
   style,
   className,
 }: TDSBottomNavProps) {
   const isToss = isTossEnvironment();
 
+  // 토스 환경: 플로팅 형태 (좌우/하단 margin, 둥근 모서리, 그림자)
   const navStyle: React.CSSProperties = isToss
     ? {
         position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: 76,
+        left: 16,
+        right: 16,
+        bottom: `calc(16px + env(safe-area-inset-bottom))`,
+        height: 56,
         backgroundColor: "#FFFFFF",
-        borderTop: "1px solid #F2F4F6",
+        borderRadius: 999,
+        boxShadow: "0 2px 16px rgba(0, 0, 0, 0.1)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-around",
-        padding: "8px 24px calc(8px + env(safe-area-inset-bottom))",
+        padding: "0 12px",
         zIndex: 100,
         ...style,
       }
@@ -68,15 +64,16 @@ export function TDSBottomNav({
       ? {
           display: "flex",
           flexDirection: "column",
-          gap: 4,
+          gap: 2,
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: active ? 600 : 400,
           color: active ? "#191F28" : "#8B95A1",
           cursor: "pointer",
           userSelect: "none",
-          minWidth: 60,
+          flex: 1,
+          padding: "6px 0",
           transition: "color 0.15s",
         }
       : {
@@ -93,75 +90,14 @@ export function TDSBottomNav({
           minWidth: 60,
         };
 
-  const fabStyle: React.CSSProperties = isToss
-    ? {
-        width: 56,
-        height: 56,
-        borderRadius: 999,
-        border: "none",
-        backgroundColor: "#3182F6",
-        color: "#FFFFFF",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "0 4px 12px rgba(49, 130, 246, 0.4)",
-        transform: "translateY(-18px)",
-        cursor: "pointer",
-        fontSize: 20,
-        transition: "transform 0.15s, box-shadow 0.15s",
-      }
-    : {
-        width: 56,
-        height: 56,
-        borderRadius: 999,
-        border: "none",
-        backgroundColor: "var(--primary)",
-        color: "var(--primary-contrast)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        transform: "translateY(-18px)",
-        cursor: "pointer",
-        fontSize: 20,
-      };
-
   const iconStyle: React.CSSProperties = {
     width: 22,
     height: 22,
   };
 
-  const leftItems = items.slice(0, Math.ceil(items.length / 2));
-  const rightItems = items.slice(Math.ceil(items.length / 2));
-
   return (
     <nav className={className} style={navStyle} aria-label="하단 내비게이션">
-      {leftItems.map((item) => (
-        <div
-          key={item.id}
-          style={navItemStyle(!!item.active)}
-          onClick={item.onClick}
-          role="button"
-          tabIndex={0}
-        >
-          <span style={iconStyle}>{item.icon}</span>
-          <span>{item.label}</span>
-        </div>
-      ))}
-
-      {centerAction && (
-        <div
-          style={fabStyle}
-          onClick={centerAction.onClick}
-          role="button"
-          tabIndex={0}
-          aria-label={centerAction.ariaLabel || "중앙 액션"}
-        >
-          {centerAction.icon}
-        </div>
-      )}
-
-      {rightItems.map((item) => (
+      {items.map((item) => (
         <div
           key={item.id}
           style={navItemStyle(!!item.active)}

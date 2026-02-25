@@ -20,9 +20,9 @@ function getLocalIP(): string {
 export default defineConfig({
   appName: "mubu", // 앱인토스 콘솔에서 설정한 앱 이름
   brand: {
-    displayName: "mubu", // 화면에 노출될 앱의 한글 이름으로 바꿔주세요.
+    displayName: "무부", // 화면에 노출될 앱의 한글 이름
     primaryColor: "#3182F6", // 화면에 노출될 앱의 기본 색상으로 바꿔주세요.
-    icon: "", // 화면에 노출될 앱의 아이콘 이미지 주소로 바꿔주세요. (아직 없으면 null)
+    icon: "https://static.toss.im/appsintoss/3795/0134e9b2-bac9-421b-84e0-44da1297a706.png",
   },
   web: {
     host: getLocalIP(), // 앱 내 웹뷰에 사용될 host (자동으로 IP 감지: 시뮬레이터는 localhost, 실기기는 실제 IP)
