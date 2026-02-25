@@ -28,11 +28,12 @@ npm install @apps-in-toss/web-framework
 - 에러 처리 포함
 - 광고 실패 시 3초 카운트다운 후 자동으로 결과 페이지 이동
 
-### 중요: 광고 로드는 AdGate에서만
+### 광고 로드 플로우 (최신)
 
-> **Analyzing.tsx에서 광고 사전 로드 제거됨**  
-> 이유: 토스 인앱 광고는 한 번에 1개만 로드 가능. Analyzing에서 사전 로드 + AdGate에서 재로드 시 충돌 발생.  
-> 규칙: `load → show`는 반드시 같은 페이지(AdGate)에서 순차적으로 실행.
+> **Analyzing.tsx에서 `preloadAd()` 호출** → `adPreloader.ts`에서 중앙 관리  
+> **AdGate.tsx에서는 `showAppsInTossAdMob()`만 호출** (이미 로드된 광고 표시)  
+> 사전 로드 실패 시 AdGate에서 재시도 load → show  
+> `adPreloader.ts`의 pendingPromise 패턴으로 중복 load 방지됨
 
 ### 테스트 광고 ID
 

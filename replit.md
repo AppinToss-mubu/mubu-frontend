@@ -186,3 +186,9 @@ npm run dev
   - **제스처 확대/축소 비활성화**: `index.html` viewport에 `user-scalable=no, maximum-scale=1.0` 추가
   - **내비게이션 바 중복 확인**: TDS 경로에서 자체 헤더/뒤로가기 없음 → 토스 내비바와 중복 없음 확인
   - **데이터 영속성**: `recentComparisons.ts` sessionStorage → localStorage 변경 (앱 종료 후 재진입 시 유지)
+
+- 2026-02-25: Claude Code 인수인계 문서 작성
+  - `docs/claude-code-handoff.md` — 프로젝트 전체 현황 종합 문서
+  - 프로젝트 개요, 기술 스택, 구조, 유저 플로우, 환경 분기, TDS 연동, 광고 SDK, API 엔드포인트, 디자인 현황, TODO 정리
+  - 디자인 반려 대응을 위한 화면별 개선 포인트 상세 기술
+  - `docs/cursor-handoff.md` 광고 플로우 설명 최신화 (adPreloader 기반 플로우 반영)
