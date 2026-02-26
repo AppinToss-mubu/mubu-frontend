@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-02-27
+
+### Removed
+- 결과 페이지 AD 배너 슬롯(회색 placeholder) 제거
+
 ## [1.0.2] - 2026-02-27
 
 ### Improved

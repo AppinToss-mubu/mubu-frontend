@@ -9,7 +9,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSummary, useExternalLink } from "../hooks/usePriceCompare";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
 import { usePriceStore } from "../store/priceStore";
-import AdBannerSlot from "../components/AdBannerSlot";
+
 import { TDSNumericSpinner } from "../components/tds";
 import { isTossEnvironment } from "../utils/env";
 import { useTDS } from "../utils/tds";
@@ -375,8 +375,6 @@ function Result() {
           )}
         </div>
 
-        <AdBannerSlot placement="result-bottom" />
-
         {/* Share section */}
         <div style={{
           marginTop: 24,
@@ -637,8 +635,6 @@ function Result() {
           </button>
         </div>
       )}
-
-      <AdBannerSlot placement="result-bottom" />
 
       {/* Share section */}
       <div style={{
