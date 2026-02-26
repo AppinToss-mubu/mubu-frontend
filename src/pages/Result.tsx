@@ -4,7 +4,7 @@
  * - 일반 웹: 기존 스타일 유지
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSummary, useExternalLink } from "../hooks/usePriceCompare";
 import { useRecentComparisons } from "../hooks/useRecentComparisons";
@@ -109,6 +109,31 @@ function Result() {
   const handlePurchase = () => {
     navigate("/");
   };
+
+  const handleShare = useCallback(async () => {
+    const message = `무부(MUBU)로 해외 쇼핑 가격 비교했어요! ${compareResult.productName} - 한국 최저가와 비교해보세요.`;
+    if (isTossEnvironment()) {
+      try {
+        const sdk = await import("@apps-in-toss/web-framework");
+        await sdk.share({ message });
+      } catch {
+        // fallback: do nothing
+      }
+    } else if (navigator.share) {
+      try {
+        await navigator.share({ title: "무부(MUBU)", text: message });
+      } catch {
+        // user cancelled
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(message);
+        alert("링크가 복사되었습니다!");
+      } catch {
+        // clipboard not available
+      }
+    }
+  }, [compareResult.productName]);
 
   const isToss = isTossEnvironment();
   const { tds, colors, ready: tdsReady } = useTDS();
@@ -352,8 +377,42 @@ function Result() {
 
         <AdBannerSlot placement="result-bottom" />
 
+        {/* Share section */}
         <div style={{
-          marginTop: 20,
+          marginTop: 24,
+          padding: "0 20px",
+          textAlign: "center",
+        }}>
+          <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular" textAlign="center">
+            이 앱이 유용하셨나요?
+          </Text>
+          <div style={{ height: 10 }} />
+          <button
+            onClick={handleShare}
+            style={{
+              background: "none",
+              border: `1px solid ${adaptive.grey200}`,
+              borderRadius: 20,
+              padding: "10px 24px",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              color: adaptive.grey600,
+              fontSize: 14,
+              fontWeight: 500,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            공유하기
+          </button>
+        </div>
+
+        <div style={{ height: 12 }} />
+        <div style={{
           padding: "0 20px",
           textAlign: "center",
         }}>
@@ -580,6 +639,37 @@ function Result() {
       )}
 
       <AdBannerSlot placement="result-bottom" />
+
+      {/* Share section */}
+      <div style={{
+        marginTop: 20, textAlign: "center",
+      }}>
+        <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 10 }}>
+          이 앱이 유용하셨나요?
+        </div>
+        <button
+          onClick={handleShare}
+          style={{
+            background: "none",
+            border: "1px solid var(--border)",
+            borderRadius: 20,
+            padding: "10px 24px",
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            color: "var(--muted)",
+            fontSize: 14,
+            fontWeight: 500,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          공유하기
+        </button>
+      </div>
 
       <div style={{
         marginTop: 16, padding: 16, fontSize: 11,
