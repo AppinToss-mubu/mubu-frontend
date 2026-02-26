@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-02-26
+
+### Fixed
+- 결과 페이지 절약 금액 +/- 부호 및 텍스트 반전 버그 수정 (토스: 텍스트 반대, 웹: 부호 반대)
+
 ## [1.0.0] - 2026-02-25
 
 ### Released
