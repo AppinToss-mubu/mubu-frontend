@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-02-27
+
+### Improved
+- 분석 중 로딩 화면 스피너 크기 개선 (토스: Loader scale 1.4배, 웹: 80→100px)
+- 홈 화면 레이아웃 개선 (Hero 패딩/타이포그래피 확대, 최근 비교 타이틀 t5→t3)
+- 홈 화면 빈 상태 UI 추가 (비교 기록 없을 때 안내 메시지)
+
+### Added
+- 결과 페이지 공유하기 버튼 (토스: SDK share, 웹: navigator.share → clipboard fallback)
+
 ## [1.0.1] - 2026-02-26
 
 ### Fixed
