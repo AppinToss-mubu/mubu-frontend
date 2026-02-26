@@ -185,9 +185,11 @@ function Analyzing() {
             </>
           ) : (
             <>
-              <Loader size="large" />
+              <div style={{ transform: "scale(1.4)", marginBottom: 8 }}>
+                <Loader size="large" />
+              </div>
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 14, color: "#8B95A1", lineHeight: 1.6 }}>
+                <div style={{ fontSize: 16, color: "#8B95A1", lineHeight: 1.6 }}>
                   {statusText}
                 </div>
               </div>
@@ -325,8 +327,8 @@ function Analyzing() {
           <>
             <div
               style={{
-                width: 80,
-                height: 80,
+                width: 100,
+                height: 100,
                 borderRadius: "50%",
                 backgroundColor: "var(--card)",
                 border: "2px solid var(--border)",
@@ -347,15 +349,15 @@ function Analyzing() {
                   animation: "spin 1.2s linear infinite",
                 }}
               />
-              <span style={{ fontSize: 32 }}>🔍</span>
+              <span style={{ fontSize: 38 }}>🔍</span>
             </div>
             <div style={{ textAlign: "center" }}>
               <div
-                style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}
+                style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}
               >
                 AI가 상품을 분석하고 있습니다
               </div>
-              <div style={{ fontSize: 14, color: "var(--muted)" }}>
+              <div style={{ fontSize: 16, color: "var(--muted)" }}>
                 {statusText}
               </div>
             </div>
