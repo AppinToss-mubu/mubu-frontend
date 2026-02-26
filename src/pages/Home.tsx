@@ -136,27 +136,27 @@ function Home() {
         {/* Hero section - left aligned */}
         <div style={{
           flex: "0 0 auto",
-          padding: "32px 20px 0",
+          padding: "40px 20px 0",
         }}>
-          <Text display="block" color={adaptive.grey500} typography="t6" fontWeight="regular">
+          <Text display="block" color={adaptive.grey500} typography="t5" fontWeight="regular">
             안녕하세요
           </Text>
-          <div style={{ height: 6 }} />
+          <div style={{ height: 8 }} />
           <Text display="block" color={adaptive.grey900} typography="t1" fontWeight="bold">
             여행자님
           </Text>
-          <div style={{ height: 10 }} />
-          <Text display="block" color={adaptive.grey600} typography="t6" fontWeight="regular">
+          <div style={{ height: 12 }} />
+          <Text display="block" color={adaptive.grey600} typography="t5" fontWeight="regular">
             해외에서 발견한 상품, 한국 가격과 비교해보세요
           </Text>
 
-          <div style={{ height: 24 }} />
+          <div style={{ height: 28 }} />
           <Button display="block" onClick={() => setIsSheetOpen(true)}>
             상품 촬영하기
           </Button>
         </div>
 
-        <div style={{ height: 40 }} />
+        <div style={{ height: 48 }} />
 
         {hiddenInputs}
 
@@ -183,7 +183,7 @@ function Home() {
             justifyContent: "space-between",
             marginBottom: 16,
           }}>
-            <Text display="block" color={adaptive.grey900} typography="t5" fontWeight="bold">
+            <Text display="block" color={adaptive.grey900} typography="t3" fontWeight="bold">
               최근 비교
             </Text>
             {recent.length > 0 && (
@@ -206,11 +206,16 @@ function Home() {
 
           {recent.length === 0 ? (
             <div style={{
-              padding: "32px 0",
+              padding: "48px 0",
               textAlign: "center",
             }}>
-              <Text display="block" color={adaptive.grey400} typography="t6" fontWeight="regular" textAlign="center">
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🙅</div>
+              <Text display="block" color={adaptive.grey400} typography="t5" fontWeight="regular" textAlign="center">
                 아직 비교한 기록이 없어요
+              </Text>
+              <div style={{ height: 6 }} />
+              <Text display="block" color={adaptive.grey300} typography="t7" fontWeight="regular" textAlign="center">
+                상품을 촬영하면 여기에 기록이 쌓여요
               </Text>
             </div>
           ) : (
@@ -374,8 +379,14 @@ function Home() {
 
         <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
           {recent.length === 0 ? (
-            <div style={{ color: "var(--muted)", padding: "8px 2px", fontSize: 14, lineHeight: "21px" }}>
-              아직 비교한 기록이 없어요.
+            <div style={{ padding: "40px 0", textAlign: "center" }}>
+              <div style={{ fontSize: 48, marginBottom: 14 }}>🙅</div>
+              <div style={{ fontSize: 15, color: "var(--muted)", marginBottom: 6 }}>
+                아직 비교한 기록이 없어요
+              </div>
+              <div style={{ fontSize: 13, color: "var(--muted)", opacity: 0.6 }}>
+                상품을 촬영하면 여기에 기록이 쌓여요
+              </div>
             </div>
           ) : (
             recent.slice(0, 3).map((r) => (
