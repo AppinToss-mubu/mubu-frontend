@@ -39,3 +39,10 @@ export function upsertRecentComparison(item: RecentComparison) {
   return next;
 }
 
+export function removeRecentComparisons(ids: string[]) {
+  const current = loadRecentComparisons();
+  const next = current.filter((x) => !ids.includes(x.id));
+  saveRecentComparisons(next);
+  return next;
+}
+
