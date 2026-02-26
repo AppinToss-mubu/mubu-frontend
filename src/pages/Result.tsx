@@ -345,9 +345,9 @@ function Result() {
             </Text>
             <Text display="block" color={adaptive.grey500} typography="t7" fontWeight="regular">
               {savedTotal > 0
-                ? "현지에서 사는 것이 더 저렴해요"
+                ? "한국에서 사는 것이 더 저렴해요"
                 : savedTotal < 0
-                  ? "한국에서 사는 것이 더 저렴해요"
+                  ? "현지에서 사는 것이 더 저렴해요"
                   : "한국과 현지 가격이 동일해요"}
             </Text>
           </div>
@@ -572,7 +572,7 @@ function Result() {
           textAlign: "center",
         }}>
           <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 4 }}>
-            {(savedTotal > 0 ? "−" : savedTotal < 0 ? "+" : "−") + " 총 절약"}
+            {(savedTotal > 0 ? "+" : savedTotal < 0 ? "−" : "") + " 총 절약"}
           </div>
           <div style={{
             fontSize: 28, fontWeight: 800,
