@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-02-27
+
+### Added
+- 전체 비교내역 페이지 편집 모드 (편집/취소 토글)
+- 비교내역 선택/전체선택 체크박스 + 삭제 기능
+
 ## [1.0.2] - 2026-02-27
 
 ### Improved
