@@ -1,4 +1,4 @@
-const AD_GROUP_ID = "ait-ad-test-interstitial-id";
+const AD_GROUP_ID = "ait.v2.live.bb15dd96415042a4";
 
 let preloadState: "idle" | "loading" | "loaded" | "failed" = "idle";
 let cleanupFn: (() => void) | null = null;
